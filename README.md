@@ -3,7 +3,7 @@
 # Estrutura do Projeto<br><br>
 
 cybersec-project/
-│── backend/                  # Diretório principal do backend
+│── backend/                  # Diretório principal do backend<br>
 │   │── config/               # Configurações do projeto Django
 │   │── core/                 # Aplicação principal
 │   │── assessments/          # Aplicação para avaliações de maturidade
