@@ -1,4 +1,4 @@
-# Projeto Future Cibersegurança.
+# Projeto Future Cybersecurity.
 
 # Estrutura do Projeto<br><br>
 
