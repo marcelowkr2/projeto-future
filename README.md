@@ -3,23 +3,54 @@
 # Estrutura do Projeto<br><br>
 
 ```
-cybersec-project/
-│── backend/                  # Diretório principal do backend
-│   │── config/               # Configurações do projeto Django
-│   │── core/                 # Aplicação principal
-│   │── assessments/          # Aplicação para avaliações de maturidade
-│   │── reports/              # Aplicação para geração de relatórios
-│   │── users/                # Aplicação para autenticação e controle de usuários
-│   │── requirements.txt      # Dependências do Python
-│   │── Dockerfile            # Configuração do Docker para o backend
-│   │── .env                  # Variáveis de ambiente
-│   └── manage.py             # Arquivo de gerenciamento do Django
+/cybersec-maturity-platform
+│── backend/                  # Diretório do Backend (Django)
+│   ├── config/               # Configurações do Django (settings, urls, wsgi, asgi)
+│   ├── core/                 # Aplicação principal com autenticação e permissões
+│   ├── assessments/          # Módulo de avaliação de maturidade
+│   ├── reports/              # Módulo de geração de relatórios
+│   ├── compliance/           # Módulo de conformidade e normas (NIST, ISO, LGPD, etc.)
+│   ├── users/                # Gerenciamento de usuários e permissões
+│   ├── api/                  # Definição das APIs REST usando Django Rest Framework
+│   ├── tests/                # Testes unitários e de integração
+│   ├── manage.py             # Arquivo de gerenciamento do Django
+│   ├── requirements.txt      # Dependências do backend
+│   ├── .env                  # Variáveis de ambiente (Banco, API Keys, JWT Secret)
 │
-│── docker-compose.yml        # Orquestração do Docker
-│── docs/                     # Documentação do projeto
-│── tests/                    # Testes automatizados
-│── scripts/                  # Scripts auxiliares
-└── README.md                 # Documentação inicial
+│── frontend/                 # Diretório do Frontend (React/Next.js)
+│   ├── components/           # Componentes reutilizáveis (Botões, Inputs, Cards)
+│   ├── pages/                # Páginas principais (Dashboard, Relatórios, Configurações)
+│   ├── services/             # Consumo da API (axios/fetch)
+│   ├── hooks/                # Hooks personalizados para autenticação, estado global
+│   ├── context/              # Context API para gerenciar estados globais
+│   ├── assets/               # Ícones, imagens, estilos globais
+│   ├── styles/               # Arquivos CSS/SASS
+│   ├── next.config.js        # Configuração do Next.js
+│   ├── package.json          # Dependências do frontend
+│
+│── database/                 # Scripts e migrações do Banco de Dados
+│   ├── migrations/           # Migrações geradas pelo Django
+│   ├── seed_data.py          # Script para popular o banco com dados iniciais
+│
+│── infra/                    # Infraestrutura e DevOps
+│   ├── docker/               # Configuração do Docker para o projeto
+│   ├── nginx/                # Configuração do Nginx para deploy
+│   ├── terraform/            # Scripts IaC para provisionamento de infraestrutura na cloud
+│
+│── docs/                     # Documentação do Projeto
+│   ├── API_Documentation.md  # Documentação das APIs REST
+│   ├── System_Architecture.md # Arquitetura do sistema
+│   ├── Compliance_Guide.md   # Diretrizes para conformidade com normas (NIST, ISO, etc.)
+│
+│── tests/                    # Testes automatizados e manuais
+│   ├── backend_tests/        # Testes unitários e de integração do backend
+│   ├── frontend_tests/       # Testes unitários e e2e do frontend
+│   ├── security_tests/       # Testes de segurança (Pentests, validação LGPD/GDPR)
+│
+│── .gitignore                # Arquivos ignorados pelo Git
+│── docker-compose.yml        # Arquivo de configuração para rodar com Docker
+│── README.md                 # Instruções gerais do projeto
+
 ```
 
 
