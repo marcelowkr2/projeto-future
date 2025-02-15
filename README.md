@@ -14,16 +14,21 @@
 │   ├── requirements.txt      # Dependências do backend
 │   ├── .env                  # Variáveis de ambiente (Banco, API Keys, JWT Secret)
 │
-│── frontend/                 # Diretório do Frontend (React/Next.js)
-│   ├── components/           # Componentes reutilizáveis (Botões, Inputs, Cards)
-│   ├── pages/                # Páginas principais (Dashboard, Relatórios, Configurações)
-│   ├── services/             # Consumo da API (axios/fetch)
-│   ├── hooks/                # Hooks personalizados para autenticação, estado global
-│   ├── context/              # Context API para gerenciar estados globais
-│   ├── assets/               # Ícones, imagens, estilos globais
-│   ├── styles/               # Arquivos CSS/SASS
-│   ├── next.config.js        # Configuração do Next.js
-│   ├── package.json          # Dependências do frontend
+frontend/                 # Diretório do Frontend (React/Next.js)
+│  ├── components/        # Componentes reutilizáveis
+│  │   ├── ui/            # Botões, Inputs, Modais
+│  │   ├── forms/         # Formulários e validações
+│  │   ├── charts/        # Gráficos e visualizações
+│  ├── context/           # Context API para gerenciar estados globais
+│  ├── hooks/             # Hooks personalizados para autenticação, estado
+│  ├── pages/             # Páginas principais (Dashboard, Relatórios, Configurações)
+│  ├── services/          # Consumo da API (axios/fetch)
+│  ├── utils/             # Funções auxiliares e helpers
+│  ├── config/            # Configurações globais, como URLs da API
+│  ├── assets/            # Ícones, imagens, estilos globais
+│  ├── styles/            # Arquivos CSS/SASS
+│  ├── next.config.js     # Configuração do Next.js
+│  ├── package.json       # Dependências do frontend
 │
 │── database/                 # Scripts e migrações do Banco de Dados
 │   ├── migrations/           # Migrações geradas pelo Django
