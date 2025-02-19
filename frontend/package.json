@@ -5,9 +5,12 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build",
-        "start": "next start"
+        "start": "next start",
+        "test": "jest"
     },
     "dependencies": {
+        "@emotion/react": "^11.14.0",
+        "@emotion/styled": "^11.14.0",
         "@mui/icons-material": "^6.4.4",
         "@mui/material": "^6.4.4",
         "axios": "^1.7.9",
@@ -15,11 +18,16 @@
         "next": "latest",
         "react": "latest",
         "react-chartjs-2": "^5.3.0",
-        "react-dom": "latest"
+        "react-dom": "latest",
+        "react-paginate": "^8.3.0",
+        "recharts": "^2.15.1"
     },
     "devDependencies": {
+        "@testing-library/jest-dom": "^6.6.3",
+        "@testing-library/react": "^16.2.0",
         "@types/node": "22.13.1",
         "@types/react": "19.0.8",
+        "jest": "^29.7.0",
         "typescript": "5.7.3"
     }
 }

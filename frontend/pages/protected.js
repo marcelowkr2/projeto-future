@@ -1,7 +1,7 @@
-import useAuth from "../hooks/useAuth";
+import { useAuth } from "../hooks/useAuth"; // Certifique-se de que o caminho está correto
 
 const ProtectedPage = () => {
-  const user = useAuth();
+  const { user } = useAuth(); // Agora você deve desestruturar do contexto
 
   if (!user) {
     return <p>Carregando...</p>;

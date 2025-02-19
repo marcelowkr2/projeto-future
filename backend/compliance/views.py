@@ -1,6 +1,6 @@
 from rest_framework import generics
 from .models import Framework, Control
-from .serializers import FrameworkSerializer, ControlSerializer
+from assessments.serializers import FrameworkSerializer, ControlSerializer
 
 class FrameworkList(generics.ListAPIView):
     queryset = Framework.objects.all()

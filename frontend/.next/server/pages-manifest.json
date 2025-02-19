@@ -2,7 +2,8 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/assessments": "pages/assessments.js",
-  "/reports": "pages/reports.js",
-  "/login": "pages/login.js"
+  "/login": "pages/login.js",
+  "/dashboard": "pages/dashboard.js",
+  "/api/control-assessments": "pages/api/control-assessments.js",
+  "/assessments": "pages/assessments.js"
 }

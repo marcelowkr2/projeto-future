@@ -2,13 +2,23 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Bar } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const Dashboard = () => {
   const [assessments, setAssessments] = useState([]);
+  const [filter, setFilter] = useState("");
 
+  // Busca as avaliações ao carregar o componente
   useEffect(() => {
     const fetchAssessments = async () => {
       try {
@@ -21,12 +31,18 @@ const Dashboard = () => {
     fetchAssessments();
   }, []);
 
+  // Filtra as avaliações com base no texto digitado
+  const filteredAssessments = assessments.filter((a) =>
+    a.question.text.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  // Dados para o gráfico
   const data = {
-    labels: assessments.map((a) => a.question.text),
+    labels: filteredAssessments.map((a) => a.question.text),
     datasets: [
       {
         label: "Pontuação",
-        data: assessments.map((a) => a.score),
+        data: filteredAssessments.map((a) => a.score),
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         borderColor: "rgba(75, 192, 192, 1)",
         borderWidth: 1,
@@ -34,20 +50,15 @@ const Dashboard = () => {
     ],
   };
 
-  return (
-    <div>
-      <h2>Dashboard de Avaliações</h2>
-      <Bar data={data} />
-    </div>
-  );
-};
-
-// components/Dashboard.js
-const handleDownloadReport = async (assessmentId) => {
+  // Função para baixar relatório
+  const handleDownloadReport = async (assessmentId) => {
     try {
-      const response = await axios.get(`/api/control-assessments/${assessmentId}/generate-report/`, {
-        responseType: "blob",
-      });
+      const response = await axios.get(
+        `/api/control-assessments/${assessmentId}/generate-report/`,
+        {
+          responseType: "blob",
+        }
+      );
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -59,26 +70,29 @@ const handleDownloadReport = async (assessmentId) => {
     }
   };
 
- 
-const [filter, setFilter] = useState("");
-
-const filteredAssessments = assessments.filter((a) =>
-  a.question.text.toLowerCase().includes(filter.toLowerCase())
-);
-
-return (
-  <div>
-    <h1>Dashboard de Avaliações</h1>
-    <input
-      type="text"
-      placeholder="Filtrar por pergunta"
-      value={filter}
-      onChange={(e) => setFilter(e.target.value)}
-    />
-    <Bar data={data} />
-  </div>
-);
-
-
+  return (
+    <div>
+      <h1>Dashboard de Avaliações</h1>
+      <input
+        type="text"
+        placeholder="Filtrar por pergunta"
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+      />
+      <Bar data={data} />
+      <div>
+        {filteredAssessments.map((assessment) => (
+          <div key={assessment.id}>
+            <h3>{assessment.question.text}</h3>
+            <p>Pontuação: {assessment.score}</p>
+            <button onClick={() => handleDownloadReport(assessment.id)}>
+              Baixar Relatório
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export default Dashboard;

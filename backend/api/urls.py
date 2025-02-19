@@ -1,9 +1,17 @@
-# backend/api/urls.py
-from django.urls import path
-from . import views  # Importe as views da API
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import ControlAssessmentViewSet
+import api.views as views
+
+router = DefaultRouter()
+router.register(r'control-assessments', ControlAssessmentViewSet, basename='control-assessment')
 
 urlpatterns = [
-    # Defina as rotas da API aqui
-    path('control-assessments/', views.ControlAssessmentViewSet.as_view(), name='control-assessment-list'),
-    path('questions/', views.QuestionList.as_view(), name='question-list'),
+    path('control-assessments/', include(router.urls)),
 ]
+
+path(
+    'control-assessments/', 
+    views.ControlAssessmentViewSet.as_view({'get': 'list', 'post': 'create'}), 
+    name='control-assessment-list'
+),

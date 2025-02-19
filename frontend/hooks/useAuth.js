@@ -1,25 +1,59 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
+import API from "../services/api";
 import { useRouter } from "next/router";
-import api from "../services/api";
 
-const useAuth = () => {
+// Cria o contexto de autenticação
+const AuthContext = createContext();
+
+// Provedor de autenticação que envolve a aplicação
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await api.get("/auth/user/"); // Ajuste com seu endpoint de usuário autenticado
-        setUser(response.data);
-      } catch (err) {
-        router.push("/login");
-      }
-    };
+    const token = localStorage.getItem("token");
 
-    checkAuth();
-  }, [router]);
+    if (token) {
+      API.defaults.headers.Authorization = `Bearer ${token}`;
 
-  return user;
+      API.get("/auth/user/")
+        .then((response) => {
+          setUser(response.data);
+        })
+        .catch(() => {
+          logout();
+        });
+    }
+  }, []);
+
+  const login = async (email, password) => {
+    try {
+      const response = await API.post("/auth/login/", { email, password });
+      localStorage.setItem("token", response.data.token);
+      API.defaults.headers.Authorization = `Bearer ${response.data.token}`;
+      setUser(response.data.user);
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+      alert("Credenciais inválidas!");
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+    API.defaults.headers.Authorization = null;
+    router.push("/login");
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
-export default useAuth;
+// Hook personalizado para usar o contexto de autenticação
+export const useAuth = () => {
+  return useContext(AuthContext); // Certifique-se de que está retornando o contexto
+};

@@ -51,20 +51,19 @@ AXES_FAILURE_LIMIT = 5  # Bloqueia usuário após 5 tentativas falhas
 # Application definition
 
 INSTALLED_APPS = [
-    'django_extensions',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',  # Django Rest Framework
-    'core',  # Aplicação principal
     'corsheaders',  # CORS
-    'rest_framework_simplejwt',  # JWT
-    'axes',  # Django Axes
+    'core',  # Adicione esta linha
+    'rest_framework',
+    'rest_framework_simplejwt',
     'assessments',
-    
+    'axes',
+    'django_extensions',
     
 ]
 
