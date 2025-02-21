@@ -1,3 +1,18 @@
+## Instruções de uso.<br>
+
+- Tenha em sua máquina instalado uma versão do Python.<br>
+- Faça download nesse link https://www.python.org/downloads/<br>
+- Baixe o projeto em sua máquina e desconpacte<br>
+- Abra o projeto no Vscode ou outra IDE de sua preferência.
+- No terminal do Vscode acesse os diretórios Backend e Frontend
+- Ex: PS C:\Users\seu-usuario\diretorio-do-projeto\cybersec-project> cd backend  e em outro terminal cd frontend.<br>
+- Em PS C:\Users\ResTIC16\Documents\cybersec-project\backend> pip install "Esse comando vai instalar as depepndencias do Python"
+- Em PS C:\Users\ResTIC16\Documents\cybersec-project\frontend> npm install "Esse comando vai instalar as dependencias do React"
+- Para subir o servidor local no Backend PS C:\Users\ResTIC16\Documents\cybersec-project\backend> python manage.py runserver
+- Para subir o servidor local Frontend PS C:\Users\ResTIC16\Documents\cybersec-project\frontend> npm run dev
+- Acesse seu navegador localhost:3000
+
+
 ## Estrutura do Projeto.
 ```
 /cybersec-maturity-platform
