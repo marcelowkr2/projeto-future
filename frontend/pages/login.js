@@ -1,4 +1,3 @@
-// frontend/pages/login.js
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import API from "../services/api";
@@ -13,16 +12,27 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      console.log("Fazendo requisição para /api/token/ com:", { username, password });
       const response = await API.post("/api/token/", { username, password });
+      console.log("Resposta da API:", response);
 
       // Salva o token no localStorage
-      localStorage.setItem("token", response.data.access); // 🔥 Padronizado para "token"
+      localStorage.setItem("token", response.data.access);
 
       // Redireciona para o dashboard
       router.push("/dashboard");
     } catch (error) {
       console.error("Erro ao fazer login:", error);
-      setError("Usuário ou senha incorretos.");
+      if (error.response) {
+        console.error("Resposta do servidor:", error.response.data);
+        setError(error.response.data.detail || "Usuário ou senha incorretos.");
+      } else if (error.request) {
+        console.error("Sem resposta do servidor:", error.request);
+        setError("Sem resposta do servidor. Verifique sua conexão.");
+      } else {
+        console.error("Erro ao configurar a requisição:", error.message);
+        setError("Erro ao tentar fazer login.");
+      }
     }
   };
 

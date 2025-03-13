@@ -19,5 +19,5 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api/control-assessments/', ControlAssessmentView.as_view(), name='control-assessments'),
     path('executive-report/', ExecutiveReportView.as_view(), name='executive-report'),
-    path('admin/', admin.site.urls),    
+       
 ]

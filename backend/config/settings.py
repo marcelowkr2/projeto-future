@@ -9,16 +9,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 user_input = "<default value>"  # Define user_input with a default value or get it from a secure source
 clean_html = bleach.clean(user_input)
 
-
 ROOT_URLCONF = 'config.urls'  # Certifique-se de que está assim
 
 AUTH_USER_MODEL = 'core.User'
 
+# Configuração correta do AUTHENTICATION_BACKENDS
 AUTHENTICATION_BACKENDS = [
-    'axes.backends.AxesStandaloneBackend',  # Adicione esta linha
+    'axes.backends.AxesStandaloneBackend',  # Deve vir antes do ModelBackend
     'django.contrib.auth.backends.ModelBackend',
 ]
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -42,14 +41,10 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_HSTS_SECONDS = 31536000  # 1 ano
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
-AUTHENTICATION_BACKENDS = [
-    'axes.backends.AxesBackend',
-    'django.contrib.auth.backends.ModelBackend',
-]
+# Application definition
 AXES_FAILURE_LIMIT = 5  # Bloqueia usuário após 5 tentativas falhas
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -57,14 +52,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',  # CORS
-    'core',  # Adicione esta linha
+    'corsheaders', 
+    'core',
     'rest_framework',
     'rest_framework_simplejwt',
     'assessments',
-    'axes',
+    'axes',  # Certifique-se de que axes está na lista
     'django_extensions',
-    
 ]
 
 SIMPLE_JWT = {
@@ -95,7 +89,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',  # CORS
-    'axes.middleware.AxesMiddleware', 
+    'axes.middleware.AxesMiddleware',  # Middleware do django-axes
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -122,10 +116,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -133,10 +125,8 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -152,17 +142,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-]
-
-AUTH_USER_MODEL = 'core.User'
-
-
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -184,23 +165,16 @@ SECURE_CONTENT_TYPE_NOSNIFF = True  # ✅ Evita que o navegador detecte tipos de
 #SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # 🔹 Inclui subdomínios
 #SECURE_HSTS_PRELOAD = True  # 🔹 Permite que o navegador pré-carregue a política
 
-
-
-
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-
 STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #✅ Detecta tentativas de login repetidas e gera alertas.
 MIDDLEWARE.append('core.middleware.SuspiciousActivityMiddleware')
-
 
 LOGGING = {
     'version': 1,
@@ -237,4 +211,3 @@ LOGGING = {
         },
     },
 }
-

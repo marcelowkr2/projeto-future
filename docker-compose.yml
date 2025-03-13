@@ -3,14 +3,14 @@ version: '3.8'
 services:
   db:
     image: postgres:15
-    container_name: cybersec_db
+    container_name: desenvolvimento_db
     restart: always
     environment:
-      POSTGRES_DB: cybersec
+      POSTGRES_DB: desenvolvimento
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: securepassword
     ports:
-      - "5432:5432"
+      - "5433:543"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -18,7 +18,7 @@ services:
     build:
       context: .
       dockerfile: infra/docker/Dockerfile
-    container_name: cybersec_backend
+    container_name: desenvolvimento_backend
     restart: always
     depends_on:
       - db
