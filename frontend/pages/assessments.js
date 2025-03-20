@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/router"; // Usando o roteamento do Next.js
 import API from "../services/api";
 
@@ -10,16 +10,23 @@ const Assessment = () => {
   const [executiveReport, setExecutiveReport] = useState(null);
   const router = useRouter(); // Hook do Next.js para redirecionamento
 
-  const handleResponseChange = useCallback((questionId, level) => {
+  // Função para atualizar as respostas
+  const handleResponseChange = (questionId, type, level) => {
     setResponses((prevResponses) => ({
       ...prevResponses,
-      [questionId]: level,
+      [questionId]: {
+        ...prevResponses[questionId],
+        [type]: level,
+      },
     }));
-  }, []);
+  };
 
+  // Função para enviar o formulário
   const handleSubmit = async () => {
     // Verificar se todas as perguntas foram respondidas
-    const unansweredQuestions = questions.filter((q) => !responses[q.id]);
+    const unansweredQuestions = questions.filter(
+      (q) => !responses[q.id]?.politica || !responses[q.id]?.pratica
+    );
     if (unansweredQuestions.length > 0) {
       alert(`Por favor, responda todas as questões.`);
       return;
@@ -31,6 +38,7 @@ const Assessment = () => {
     setExecutiveReport(null); // Resetando o relatório antes de gerar novo
 
     try {
+      // Calcula a maturidade média
       const maturityResults = calculateMaturity(responses, questions);
       const payload = {
         responses,
@@ -44,9 +52,6 @@ const Assessment = () => {
       // Gera o relatório executivo
       const report = generateExecutiveReport(maturityResults);
       setExecutiveReport(report);
-
-      // Envia o relatório executivo para o backend (ou estado global)
-      await API.post("/assessments/api/save-assessments/", report);
 
       setSubmitSuccess(true);
       alert("Avaliação enviada e salva com sucesso!");
@@ -63,45 +68,51 @@ const Assessment = () => {
     }
   };
 
+  // Função para calcular a maturidade média
   const calculateMaturity = (responses, questions) => {
-    const maturityByControl = {};
+    const maturityByCategory = {};
 
     questions.forEach((q) => {
-      if (!maturityByControl[q.control_id]) {
-        maturityByControl[q.control_id] = { total: 0, count: 0 };
+      if (!maturityByCategory[q.category]) {
+        maturityByCategory[q.category] = { total: 0, count: 0 };
       }
-      if (responses[q.id]) {
-        maturityByControl[q.control_id].total += responses[q.id];
-        maturityByControl[q.control_id].count += 1;
+      if (responses[q.id]?.politica && responses[q.id]?.pratica) {
+        const average =
+          (responses[q.id].politica + responses[q.id].pratica) / 2;
+        maturityByCategory[q.category].total += average;
+        maturityByCategory[q.category].count += 1;
       }
     });
 
-    return Object.keys(maturityByControl).map((controlId) => ({
-      control_id: controlId,
+    return Object.keys(maturityByCategory).map((category) => ({
+      category,
       average_maturity:
-        maturityByControl[controlId].count === 0
+        maturityByCategory[category].count === 0
           ? 0
-          : maturityByControl[controlId].total / maturityByControl[controlId].count,
+          : maturityByCategory[category].total / maturityByCategory[category].count,
     }));
   };
 
+  // Função para gerar o relatório executivo
   const generateExecutiveReport = (maturityResults) => {
     const averageMaturity =
       maturityResults.reduce((sum, result) => sum + result.average_maturity, 0) /
       maturityResults.length;
 
-    const lowMaturityControls = maturityResults.filter(
+    const lowMaturityCategories = maturityResults.filter(
       (result) => result.average_maturity < 3
     );
 
     return {
       averageMaturity: averageMaturity.toFixed(2),
-      lowMaturityControls,
+      lowMaturityCategories,
       recommendations: [
-        "Implementar automação para inventário de ativos.",
-        "Melhorar o controle de acesso físico e lógico.",
-        "Integrar inteligência artificial para detecção de anomalias.",
-        "Revisar políticas de segurança periodicamente.",
+        "Implementar políticas de privacidade claras e documentadas.",
+        "Realizar inventário completo de dados pessoais.",
+        "Reforçar controles de acesso e autenticação.",
+        "Implementar monitoramento contínuo de segurança.",
+        "Desenvolver e testar planos de resposta a incidentes.",
+        "Estabelecer um plano de recuperação de desastres robusto.",
       ],
     };
   };
@@ -110,81 +121,33 @@ const Assessment = () => {
   const questions = [
     {
       id: 1,
-      control_id: 1,
-      category: "Governança",
-      question_text: "A empresa mantém um inventário atualizado de todos os ativos de hardware?",
-      maturity_levels: {
-        1: "Não há inventário.",
-        2: "Inventário parcialmente atualizado.",
-        3: "Inventário atualizado, mas sem automação.",
-        4: "Inventário atualizado e automatizado.",
-        5: "Inventário atualizado, automatizado e integrado a ferramentas de segurança.",
-      },
+      category: "Governar",
+      question_text: "A empresa possui uma política de privacidade e proteção de dados formalmente documentada?",
     },
     {
       id: 2,
-      control_id: 2,
-      category: "Segurança de Acesso",
-      question_text: "A empresa adota autenticação multifator para acessos sensíveis?",
-      maturity_levels: {
-        1: "Não há autenticação multifator.",
-        2: "Autenticação multifator implementada em poucos sistemas.",
-        3: "Autenticação multifator implementada na maioria dos sistemas.",
-        4: "Autenticação multifator obrigatória para todos os acessos sensíveis.",
-        5: "Autenticação multifator integrada com mecanismos de inteligência artificial para detecção de anomalias.",
-      },
+      category: "Identificar",
+      question_text: "A empresa identificou todos os tipos de dados pessoais que coleta, processa e armazena?",
     },
     {
       id: 3,
-      control_id: 3,
-      category: "Proteção",
-      question_text: "A empresa realiza criptografia de dados sensíveis em repouso e em trânsito?",
-      maturity_levels: {
-        1: "Não há criptografia.",
-        2: "Criptografia parcial implementada em alguns dados.",
-        3: "Criptografia de dados em repouso implementada.",
-        4: "Criptografia de dados em repouso e em trânsito implementada.",
-        5: "Criptografia automatizada e monitorada para todos os dados sensíveis.",
-      },
+      category: "Proteger",
+      question_text: "A empresa implementou controles de acesso para garantir que apenas pessoas autorizadas tenham acesso a dados pessoais?",
     },
     {
       id: 4,
-      control_id: 4,
-      category: "Detecção",
-      question_text: "A empresa possui um sistema de monitoramento contínuo para detectar intrusões?",
-      maturity_levels: {
-        1: "Não há sistema de monitoramento.",
-        2: "Monitoramento implementado, mas não contínuo.",
-        3: "Monitoramento contínuo com ferramentas básicas.",
-        4: "Monitoramento contínuo com ferramentas avançadas de detecção.",
-        5: "Monitoramento contínuo com IA para detecção preditiva e automatizada de intrusões.",
-      },
+      category: "Detectar",
+      question_text: "A empresa possui sistemas de monitoramento contínuo para detectar atividades incomuns ou acessos não autorizados a dados pessoais?",
     },
     {
       id: 5,
-      control_id: 5,
-      category: "Resposta",
-      question_text: "A empresa possui um plano de resposta a incidentes documentado e testado?",
-      maturity_levels: {
-        1: "Não há plano de resposta.",
-        2: "Plano de resposta implementado, mas não testado.",
-        3: "Plano de resposta testado e documentado.",
-        4: "Plano de resposta testado regularmente com simulações.",
-        5: "Plano de resposta com melhorias contínuas baseado em simulações realistas.",
-      },
+      category: "Responder",
+      question_text: "A empresa possui um plano de resposta a incidentes de segurança que inclui violações de dados pessoais?",
     },
     {
       id: 6,
-      control_id: 6,
-      category: "Recuperação",
-      question_text: "A empresa possui um plano de recuperação de desastres testado e documentado?",
-      maturity_levels: {
-        1: "Não há plano de recuperação.",
-        2: "Plano de recuperação implementado, mas não testado.",
-        3: "Plano de recuperação testado e documentado.",
-        4: "Plano de recuperação testado regularmente com melhorias contínuas.",
-        5: "Plano de recuperação com melhorias baseadas em análise pós-incidente.",
-      },
+      category: "Recuperar",
+      question_text: "A empresa possui um plano de recuperação de desastres (DRP) que inclui a recuperação de dados pessoais?",
     },
   ];
 
@@ -198,20 +161,20 @@ const Assessment = () => {
   const groupedEntries = Object.entries(groupedQuestions);
 
   return (
-    <div>
+    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
       <h1>Avaliação de Maturidade de Cibersegurança</h1>
       {submitError && <p style={{ color: "red" }}>{submitError}</p>}
       {submitSuccess && <p style={{ color: "green" }}>Avaliação enviada com sucesso!</p>}
 
       {/* Exibe relatório executivo após o envio com sucesso */}
       {executiveReport && (
-        <div>
+        <div style={{ marginTop: "20px", padding: "10px", border: "1px solid #ccc" }}>
           <h2>Relatório Executivo</h2>
           <p><strong>Média de Maturidade:</strong> {executiveReport.averageMaturity}</p>
           <p><strong>Áreas de Baixo Desempenho:</strong></p>
           <ul>
-            {executiveReport.lowMaturityControls.map((control, index) => (
-              <li key={index}>Controle {control.control_id} - Maturidade: {control.average_maturity}</li>
+            {executiveReport.lowMaturityCategories.map((category, index) => (
+              <li key={index}>{category.category} - Maturidade: {category.average_maturity.toFixed(2)}</li>
             ))}
           </ul>
           <p><strong>Ações Recomendadas:</strong></p>
@@ -225,31 +188,60 @@ const Assessment = () => {
 
       {/* Renderiza o questionário */}
       {groupedEntries.map(([category, categoryQuestions]) => (
-        <div key={category}>
+        <div key={category} style={{ marginBottom: "30px" }}>
           <h2>{category}</h2>
           {categoryQuestions.map((q) => (
-            <div key={q.id}>
+            <div key={q.id} style={{ marginBottom: "20px" }}>
               <h3>{q.question_text}</h3>
-              {[1, 2, 3, 4, 5].map((level) => (
-                <div key={level}>
-                  <label>
-                    <input
-                      type="radio"
-                      name={`question-${q.id}`}
-                      value={level}
-                      onChange={() => handleResponseChange(q.id, level)}
-                      checked={responses[q.id] === level}
-                    />
-                    {q.maturity_levels[level]}
-                  </label>
-                </div>
-              ))}
+              <div style={{ marginBottom: "10px" }}>
+                <label>Política:</label>
+                <select
+                  value={responses[q.id]?.politica || ""}
+                  onChange={(e) =>
+                    handleResponseChange(q.id, "politica", parseInt(e.target.value))
+                  }
+                  style={{ marginLeft: "10px" }}
+                >
+                  <option value="">Selecione</option>
+                  <option value="1">Inicial</option>
+                  <option value="2">Gerenciado</option>
+                  <option value="3">Definido</option>
+                  <option value="4">Otimizado</option>
+                </select>
+              </div>
+              <div>
+                <label>Prática:</label>
+                <select
+                  value={responses[q.id]?.pratica || ""}
+                  onChange={(e) =>
+                    handleResponseChange(q.id, "pratica", parseInt(e.target.value))
+                  }
+                  style={{ marginLeft: "10px" }}
+                >
+                  <option value="">Selecione</option>
+                  <option value="1">Inicial</option>
+                  <option value="2">Gerenciado</option>
+                  <option value="3">Definido</option>
+                  <option value="4">Otimizado</option>
+                </select>
+              </div>
             </div>
           ))}
         </div>
       ))}
 
-      <button onClick={handleSubmit} disabled={isSubmitting}>
+      <button
+        onClick={handleSubmit}
+        disabled={isSubmitting}
+        style={{
+          padding: "10px 20px",
+          backgroundColor: "#007bff",
+          color: "#fff",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+        }}
+      >
         {isSubmitting ? "Enviando..." : "Enviar Avaliação"}
       </button>
     </div>

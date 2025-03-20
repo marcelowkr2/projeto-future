@@ -64,7 +64,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'assessments',
-    'axes',  # Certifique-se de que axes está na lista
+    'axes',
     'django_extensions',
     'users',
 ]

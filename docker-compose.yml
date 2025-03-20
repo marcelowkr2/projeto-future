@@ -16,8 +16,8 @@ services:
       - ./frontend:/app
       - /app/node_modules
     environment:
-      - NODE_ENV=development
-    command: npx nodemon
+       - NODE_ENV=development
+    command: npm run dev
     restart: always
     networks:
       - cybersecurity_network

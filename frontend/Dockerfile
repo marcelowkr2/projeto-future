@@ -17,4 +17,6 @@ COPY . .
 EXPOSE 3000
 
 # Comando para iniciar o frontend no modo desenvolvimento
-CMD ["npx", "nodemon", "--legacy-watch"]
+CMD ["npm", "run", "dev"]
+
+
