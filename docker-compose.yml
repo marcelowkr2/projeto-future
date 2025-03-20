@@ -1,29 +1,33 @@
-version: '3.8'
+name: future-cybersecurity
+
+networks:
+  cybersecurity_network: 
+    driver: bridge
 
 services:
-  db:
-    image: postgres:15
-    container_name: desenvolvimento_db
-    restart: always
-    environment:
-      POSTGRES_DB: desenvolvimento
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: securepassword
+  frontend:
+    container_name: cybersecurity_frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
-      - "5433:543"
+      - "3000:3000"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npx nodemon
+    restart: always
+    networks:
+      - cybersecurity_network
 
+      
   backend:
+    container_name: cybersecurity_backend
     build:
       context: .
       dockerfile: infra/docker/Dockerfile
-    container_name: desenvolvimento_backend
-    restart: always
-    depends_on:
-      - db
-    env_file:
-      - backend/.env
     ports:
       - "8000:8000"
     volumes:
@@ -31,6 +35,29 @@ services:
     command: >
       sh -c "python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - ENV=development
+    depends_on:
+      - db
+    restart: always
+    networks:
+      - cybersecurity_network
+
+  db:
+    image: postgres:17
+    container_name: cybersecurity_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: dU2q4Lpm12@#$
+      POSTGRES_DB: cybersecurity_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - cybersecurity_network
 
 volumes:
-  postgres_data:
+  db_data:
+    driver: local
