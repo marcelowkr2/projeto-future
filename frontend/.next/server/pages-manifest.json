@@ -1,6 +1,17 @@
 {
-  "/_error": "pages/_error.js",
   "/_app": "pages/_app.js",
+  "/dashboard": "pages/dashboard.html",
+  "/api/control-assessments": "pages/api/control-assessments.js",
+  "/_error": "pages/_error.js",
+  "/": "pages/index.html",
+  "/login": "pages/login.html",
+  "/assessments": "pages/assessments.html",
+  "/users": "pages/users.html",
+  "/questions": "pages/questions.html",
+  "/compliance": "pages/compliance.html",
+  "/protected": "pages/protected.html",
+  "/new": "pages/new.html",
+  "/reports": "pages/reports.html",
   "/_document": "pages/_document.js",
   "/404": "pages/404.html"
 }

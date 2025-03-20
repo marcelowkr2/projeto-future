@@ -1139,3 +1139,9 @@ Traceback (most recent call last):
 django.db.utils.OperationalError: no such table: core_standard
 WARNING 2025-03-20 09:57:24,309 signals Permiss�es do usu�rio Administrador foram alteradas.
 WARNING 2025-03-20 09:57:24,323 signals Permiss�es do usu�rio Analista de Seguran�a foram alteradas.
+WARNING 2025-03-20 13:40:44,950 signals Permissões do usuário Administrador foram alteradas.
+WARNING 2025-03-20 13:40:44,956 signals Permissões do usuário Analista de Segurança foram alteradas.
+WARNING 2025-03-20 13:47:27,110 signals Permissões do usuário Administrador foram alteradas.
+WARNING 2025-03-20 13:47:27,117 signals Permissões do usuário Analista de Segurança foram alteradas.
+WARNING 2025-03-20 13:50:59,789 signals Permissões do usuário Administrador foram alteradas.
+WARNING 2025-03-20 13:50:59,794 signals Permissões do usuário Analista de Segurança foram alteradas.
