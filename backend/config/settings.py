@@ -11,7 +11,8 @@ clean_html = bleach.clean(user_input)
 
 ROOT_URLCONF = 'config.urls'  # Certifique-se de que está assim
 
-AUTH_USER_MODEL = 'core.User'
+AUTH_USER_MODEL = 'users.CustomUser'
+
 
 # Configuração correta do AUTHENTICATION_BACKENDS
 AUTHENTICATION_BACKENDS = [
@@ -28,7 +29,13 @@ SECRET_KEY = 'django-insecure-6ju2dr8-#u-()jr87xfm+(^o_rv0r)=#@oxy#jjv+&-@(r5-b6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# Desativar a segurança HTTPS no desenvolvimento
+SECURE_SSL_REDIRECT = False  # Não redirecionar automaticamente para HTTPS
+SECURE_HSTS_SECONDS = 0
+SESSION_COOKIE_SECURE = False  # Permitir cookies em HTTP
+CSRF_COOKIE_SECURE = False  # Permitir CSRF em HTTP
+
+ALLOWED_HOSTS = ['*']
 
 #CSRF_COOKIE_SECURE = True
 CSRF_USE_SESSIONS = True
@@ -59,6 +66,7 @@ INSTALLED_APPS = [
     'assessments',
     'axes',  # Certifique-se de que axes está na lista
     'django_extensions',
+    'users',
 ]
 
 SIMPLE_JWT = {

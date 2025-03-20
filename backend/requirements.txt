@@ -15,5 +15,3 @@ bleach
 flask-cors
 django_extensions
 matplotlib
-streamlit
-weasyprint

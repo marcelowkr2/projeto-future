@@ -1137,3 +1137,5 @@ Traceback (most recent call last):
     return super().execute(query, params)
            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
 django.db.utils.OperationalError: no such table: core_standard
+WARNING 2025-03-20 09:57:24,309 signals Permissões do usuário Administrador foram alteradas.
+WARNING 2025-03-20 09:57:24,323 signals Permissões do usuário Analista de Segurança foram alteradas.
