@@ -9,6 +9,15 @@ export const login = async (username, password) => {
   throw new Error('Falha na autenticação');
 };
 
+export const saveAuthToken = (token) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("token", token);
+  }
+};
+
+
 export const logout = () => {
   localStorage.removeItem('token');
 };
+
+

@@ -11,8 +11,17 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status
 
-def get_questions(request):
-    return JsonResponse({"questions": []})  # Exemplo básico
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .models import Question
+from .serializers import QuestionSerializer
+
+class QuestionListView(APIView):
+    def get(self, request):
+        questions = Question.objects.all()
+        print("QUESTÕES ENCONTRADAS:", questions)  # Depuração no terminal
+        serializer = QuestionSerializer(questions, many=True)
+        return Response({"questions": serializer.data})
 
 
 class ExecutiveReportView(APIView):
