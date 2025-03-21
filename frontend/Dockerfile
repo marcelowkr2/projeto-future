@@ -5,7 +5,7 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Copia os arquivos de dependências primeiro para aproveitar o cache do Docker
-COPY package.json package-lock.json ./
+COPY package*.json ./
 
 # Instala as dependências
 RUN npm install

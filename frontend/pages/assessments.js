@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import API from "../services/api";
+import Question from "../components/Question";  // Novo componente
 
 const Assessment = () => {
   const [questions, setQuestions] = useState([]);
@@ -35,19 +36,12 @@ const Assessment = () => {
     <div>
       <h1>Avaliação de Maturidade</h1>
       {questions.map((q) => (
-        <div key={q.id}>
-          <h3>{q.question_text}</h3>
-          <select
-            value={responses[q.id]?.politica || ""}
-            onChange={(e) => handleResponseChange(q.id, "politica", parseInt(e.target.value))}
-          >
-            <option value="">Selecione</option>
-            <option value="1">Inicial</option>
-            <option value="2">Gerenciado</option>
-            <option value="3">Definido</option>
-            <option value="4">Otimizado</option>
-          </select>
-        </div>
+        <Question
+          key={q.id}
+          question={q}
+          response={responses[q.id]}
+          handleResponseChange={handleResponseChange}
+        />
       ))}
     </div>
   );

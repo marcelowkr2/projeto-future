@@ -8,3 +8,15 @@ module.exports = {
       ];
     },
   };
+
+  module.exports = {
+    reactStrictMode: true,
+    webpackDevMiddleware: config => {
+      config.watchOptions = {
+        poll: 1000, // Verifica as mudanças a cada 1 segundo
+        aggregateTimeout: 300, // Espera 300ms para o próximo evento
+      };
+      return config;
+    },
+  };
+  
