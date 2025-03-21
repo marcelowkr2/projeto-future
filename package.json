@@ -4,7 +4,7 @@
     "description": "Projeto Future-Serra com Frontend, Backend e PostgreSQL",
     "main": "index.js",
     "scripts": {
-      "dev": "docker-compose up --build",
+      "dev": "docker-compose up --build", 
       "start": "docker-compose up",
       "stop": "docker-compose down",
       "frontend:dev": "cd frontend && npm install && npm run dev",

@@ -17,6 +17,7 @@ services:
       - /app/node_modules
     environment:
        - NODE_ENV=development
+       - CHOKIDAR_USEPOLLING=true # Adiciona suporte a sistemas de arquivos que não detectam alterações (como em contêineres)
     command: npm run dev
     restart: always
     networks:
@@ -37,6 +38,7 @@ services:
              python manage.py runserver 0.0.0.0:8000"
     environment:
       - ENV=development
+      - CHOKIDAR_USEPOLLING=true # Adiciona suporte a sistemas de arquivos que não detectam alterações (como em contêineres)
     depends_on:
       - db
     restart: always

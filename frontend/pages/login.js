@@ -20,7 +20,7 @@ const Login = () => {
       localStorage.setItem("token", response.data.access);
 
       // Redireciona para o dashboard
-      router.push("/dashboard");
+      router.push("/assessments");
     } catch (error) {
       console.error("Erro ao fazer login:", error);
       if (error.response) {

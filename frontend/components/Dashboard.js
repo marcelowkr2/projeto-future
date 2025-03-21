@@ -43,8 +43,8 @@ const Dashboard = () => {
       {
         label: "Pontuação",
         data: filteredAssessments.map((a) => a.score),
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        borderColor: "rgba(75, 192, 192, 1)",
+        backgroundColor: "rgba(35, 173, 150, 0.2)",
+        borderColor: "rgb(35, 143, 231)",
         borderWidth: 1,
       },
     ],
