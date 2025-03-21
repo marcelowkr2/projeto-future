@@ -2,8 +2,8 @@ from django.http import JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets
-from .models import ControlAssessment
-from .serializers import ControlAssessmentSerializer
+from .models import ControlAssessment, RiskAssessment
+from .serializers import ControlAssessmentSerializer, RiskAssessmentSerializer
 import json
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -11,28 +11,34 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status
 
+def get_questions(request):
+    return JsonResponse({"questions": []})  # Exemplo básico
+
+
 class ExecutiveReportView(APIView):
     def get(self, request):
-        data = {
-            "message": "Relatório executivo gerado com sucesso",
-            "averageMaturity": 75,
-            "lowMaturityControls": [],
-            "recommendations": []
-        }
-        return Response(data, status=status.HTTP_200_OK)
+        assessments = ControlAssessment.objects.all()
+
+        # Se não houver avaliações, evitar erro de divisão por zero
+        if not assessments.exists():
+            return Response({
+                "message": "Nenhuma avaliação encontrada.",
+                "averageMaturity": 0,
+                "lowMaturityControls": [],
+                "recommendations": []
+            }, status=status.HTTP_200_OK)
 
         # Calcula a média de maturidade
-        total_score = sum(a.score for a in assessments)
-        average_maturity = total_score / len(assessments) if assessments else 0
+        total_score = sum(a.score for a in assessments if a.score is not None)
+        average_maturity = total_score / len(assessments) if total_score else 0
 
         # Identifica áreas de baixo desempenho (pontuação < 3)
         low_maturity_controls = [
             {
-                "control_id": a.question.control_id,
+                "control_id": a.question.id,  # Corrigido: Usar `id` no lugar de `control_id`
                 "average_maturity": a.score,
             }
-            for a in assessments
-            if a.score < 3
+            for a in assessments if a.score and a.score < 3
         ]
 
         recommendations = [
@@ -61,7 +67,6 @@ class ControlAssessmentView(APIView):
         date_to = request.query_params.get('date_to', None)
         category = request.query_params.get('category', None)
 
-
         # Construindo o queryset com base nos parâmetros recebidos
         assessments = ControlAssessment.objects.all()
 
@@ -77,41 +82,13 @@ class ControlAssessmentView(APIView):
         if date_to:
             assessments = assessments.filter(date__lte=date_to)
 
-            # Serializando as avaliações e retornando a resposta
+        # Serializando as avaliações e retornando a resposta
         serialized_assessments = ControlAssessmentSerializer(assessments, many=True)
         return Response(serialized_assessments.data)
-
-
-from .models import RiskAssessment
-from .serializers import RiskAssessmentSerializer
 
 class RiskAssessmentViewSet(viewsets.ModelViewSet):
     queryset = RiskAssessment.objects.all()
     serializer_class = RiskAssessmentSerializer
-
-class MaturityResultsView(View):
-    def get(self, request):
-        return JsonResponse({"results": []}) 
-
-@csrf_exempt
-def get_maturity_results(request):
-    if request.method == 'GET':
-        try:
-            # Simulando dados de conformidade, por exemplo, com base em uma avaliação
-            maturity_results = {
-                "PPSI": 85,
-                "NIST_CSF": 75,
-                "ISO": 90,
-                "NIST_Privacy": 70
-            }
-
-            # Retornando os dados de conformidade
-            return JsonResponse(maturity_results)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
-
-    return JsonResponse({'status': 'error', 'message': 'Método não permitido'}, status=405)
-
 
 @csrf_exempt
 def save_assessment(request):
@@ -121,28 +98,10 @@ def save_assessment(request):
             responses = data.get('responses')
             maturity_results = data.get('maturityResults')
 
-            # Salvar as respostas e resultados no banco de dados
-            # Exemplo: Assessment.objects.create(responses=responses, maturity_results=maturity_results)
+            # Exemplo de salvamento no banco (ajuste conforme necessário)
+            # Assessment.objects.create(responses=responses, maturity_results=maturity_results)
 
             return JsonResponse({'status': 'success', 'message': 'Avaliação salva com sucesso!'})
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
-    return JsonResponse({'status': 'error', 'message': 'Método não permitido'}, status=405)
-
-@csrf_exempt
-def get_maturity_results(request):
-    if request.method == 'GET':
-        try:
-            # Exemplo de dados de maturidade
-
-            
-            maturity_results = [
-                {"control_id": 1, "average_maturity": 3.5},
-                {"control_id": 2, "average_maturity": 4.0},
-                {"control_id": 3, "average_maturity": 2.5},
-            ]
-
-            return JsonResponse(maturity_results, safe=False)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
     return JsonResponse({'status': 'error', 'message': 'Método não permitido'}, status=405)

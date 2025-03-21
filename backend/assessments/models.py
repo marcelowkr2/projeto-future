@@ -1,7 +1,5 @@
 from django.db import models
 from django.conf import settings
-from django.contrib.auth import get_user_model
-
 
 class Question(models.Model):
     CATEGORY_CHOICES = [
@@ -27,7 +25,7 @@ class Question(models.Model):
 
     def __str__(self):
         return f"{self.get_category_display()} - {self.text[:30]}..."
-
+    
 
 class Assessment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='core_assessments')

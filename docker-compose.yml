@@ -46,13 +46,13 @@ services:
       - cybersecurity_network
 
   db:
-    image: postgres:17
+    image: postgres:latest
     container_name: cybersecurity_db
     restart: always
     environment:
+      POSTGRES_DB: cybersecurity
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: dU2q4Lpm12@#$
-      POSTGRES_DB: cybersecurity_db
     ports:
       - "5432:5432"
     volumes:
