@@ -1,7 +1,7 @@
 name: future-cybersecurity
 
 networks:
-  cybersecurity_network: 
+  cybersecurity_network:
     driver: bridge
 
 services:
@@ -16,14 +16,13 @@ services:
       - ./frontend:/app
       - /app/node_modules
     environment:
-       - NODE_ENV=development
-       - CHOKIDAR_USEPOLLING=true # Adiciona suporte a sistemas de arquivos que não detectam alterações (como em contêineres)
-    command: npm run dev
+      - NODE_ENV=development
+    command: npm run dev  # Comando de desenvolvimento
     restart: always
     networks:
       - cybersecurity_network
 
-      
+    
   backend:
     container_name: cybersecurity_backend
     build:
@@ -54,7 +53,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: dU2q4Lpm12@#$
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
