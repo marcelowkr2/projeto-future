@@ -1,11 +1,1 @@
-{
-  "/_app": "pages/_app.js",
-  "/_document": "pages/_document.js",
-  "/_error": "pages/_error.js",
-  "/login": "pages/login.js",
-  "/assessments": "pages/assessments.js",
-  "/dashboard": "pages/dashboard.js",
-  "/protected": "pages/protected.js",
-  "/api/control-assessments": "pages/api/control-assessments.js",
-  "/compliance": "pages/compliance.js"
-}
+{}

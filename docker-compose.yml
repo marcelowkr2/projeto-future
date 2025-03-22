@@ -1,12 +1,12 @@
-name: future-cybersecurity
+name: futuresecurity
 
 networks:
-  cybersecurity_network:
+  futuresecurity_network:
     driver: bridge
 
 services:
   frontend:
-    container_name: cybersecurity_frontend
+    container_name: futuresecurity_frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -20,11 +20,11 @@ services:
     command: npm run dev  # Comando de desenvolvimento
     restart: always
     networks:
-      - cybersecurity_network
+      - futuresecurity_network
 
     
   backend:
-    container_name: cybersecurity_backend
+    container_name: futuresecurity_backend
     build:
       context: .
       dockerfile: infra/docker/Dockerfile
@@ -42,14 +42,14 @@ services:
       - db
     restart: always
     networks:
-      - cybersecurity_network
+      - futuresecurity_network
 
   db:
     image: postgres:latest
-    container_name: cybersecurity_db
+    container_name: futuresecurity_db
     restart: always
     environment:
-      POSTGRES_DB: cybersecurity
+      POSTGRES_DB: futuresecurity
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: dU2q4Lpm12@#$
     ports:
@@ -57,7 +57,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
-      - cybersecurity_network
+      - futuresecurity_network
 
 volumes:
   db_data:

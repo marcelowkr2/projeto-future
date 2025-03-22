@@ -1,8 +1,6 @@
 import bleach
 from django.db import models
-from cryptography.fernet import Fernet
 from django.conf import settings
-from .utils import encrypt_data, decrypt_data
 from django.contrib.auth.models import AbstractUser, Group, Permission
 
 # Frameworks de segurança (NIST, CIS, ISO, etc.)
@@ -112,6 +110,16 @@ class User(AbstractUser):
             self.is_staff = False
             self.is_superuser = False
 
+
+from cryptography.fernet import Fernet
+
+def encrypt_data(data: str, key: str) -> bytes:
+    fernet = Fernet(key.encode())
+    return fernet.encrypt(data.encode())
+
+def decrypt_data(data: bytes, key: str) -> str:
+    fernet = Fernet(key.encode())
+    return fernet.decrypt(data).decode()
 
 # Modelo de perfil do usuário com criptografia de CPF
 class Profile(models.Model):
