@@ -1,3 +1,4 @@
+// Assessment.js
 import React, { useState, useEffect } from "react";
 import API from "../services/api";
 import Question from "../components/Question"; // Componente de pergunta
@@ -12,10 +13,16 @@ const Assessment = () => {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const token = getAuthToken(); // Obtém o token do localStorage ou similar
+        const token = getAuthToken(); // Obtém o token do localStorage ou outro lugar
+        if (!token) {
+          setError("Token JWT não encontrado. Por favor, faça login.");
+          return;
+        }
+
+        // Requisição à API para obter as questões
         const response = await API.get("api/assessments/", {
           headers: {
-            Authorization: `Bearer ${token}`, // Envia o token no cabeçalho
+            Authorization: `Bearer ${token}`, // Envia o token JWT no cabeçalho
           },
         });
 
@@ -28,7 +35,7 @@ const Assessment = () => {
             category: q.category,
             text: q.text,
           }));
-          setQuestions(formattedQuestions);
+          setQuestions(formattedQuestions); // Atualiza as perguntas no estado
         } else {
           throw new Error("Formato inesperado de resposta da API");
         }
@@ -40,16 +47,13 @@ const Assessment = () => {
       }
     };
 
-    fetchQuestions();
-  }, []);
+    fetchQuestions(); // Chama a função para buscar as questões quando o componente for montado
+  }, []); // O array vazio garante que a requisição seja feita apenas uma vez
 
-  const handleResponseChange = (questionId, type, level) => {
+  const handleResponseChange = (questionId, level) => {
     setResponses((prevResponses) => ({
       ...prevResponses,
-      [questionId]: {
-        ...prevResponses[questionId],
-        [type]: level,
-      },
+      [questionId]: level,
     }));
   };
 

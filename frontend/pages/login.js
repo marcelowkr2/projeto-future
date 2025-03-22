@@ -16,8 +16,8 @@ const Login = () => {
       const response = await API.post("/api/token/", { username, password });
       console.log("Resposta da API:", response);
 
-      // Salva o token no localStorage
-      localStorage.setItem("token", response.data.access);
+      // Salva o token no localStorage com a chave 'authToken'
+      localStorage.setItem("authToken", response.data.access);
 
       // Redireciona para o dashboard
       router.push("/assessments");
