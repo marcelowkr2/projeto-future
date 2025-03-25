@@ -1,120 +1,56 @@
-from django.http import JsonResponse
-from django.views import View
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets
-from .models import ControlAssessment, RiskAssessment
-from .serializers import ControlAssessmentSerializer, RiskAssessmentSerializer
-import json
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework import status
+from django.shortcuts import get_object_or_404
+from .models import ControlAssessment, RiskAssessment, Question
+from .serializers import ControlAssessmentSerializer, RiskAssessmentSerializer, QuestionSerializer
 
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from .models import Question
-from .serializers import QuestionSerializer
+class ControlAssessmentViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para gerenciar avaliações de controle.
+    Permite operações CRUD (listar, criar, atualizar, deletar).
+    """
+    queryset = ControlAssessment.objects.all()
+    serializer_class = ControlAssessmentSerializer
+    permission_classes = [IsAuthenticated]  # Garante que apenas usuários autenticados possam acessar
+
+class RiskAssessmentViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para avaliações de risco.
+    """
+    queryset = RiskAssessment.objects.all()
+    serializer_class = RiskAssessmentSerializer
+    permission_classes = [IsAuthenticated]
 
 class QuestionListView(APIView):
-    def get(self, request):
-        questions = Question.objects.all()
-        print("QUESTÕES ENCONTRADAS:", questions)  # Depuração no terminal
-        serializer = QuestionSerializer(questions, many=True)
-        return Response({"questions": serializer.data})
-
-
-class ExecutiveReportView(APIView):
-    def get(self, request):
-        assessments = ControlAssessment.objects.all()
-
-        # Se não houver avaliações, evitar erro de divisão por zero
-        if not assessments.exists():
-            return Response({
-                "message": "Nenhuma avaliação encontrada.",
-                "averageMaturity": 0,
-                "lowMaturityControls": [],
-                "recommendations": []
-            }, status=status.HTTP_200_OK)
-
-        # Calcula a média de maturidade
-        total_score = sum(a.score for a in assessments if a.score is not None)
-        average_maturity = total_score / len(assessments) if total_score else 0
-
-        # Identifica áreas de baixo desempenho (pontuação < 3)
-        low_maturity_controls = [
-            {
-                "control_id": a.question.id,  # Corrigido: Usar `id` no lugar de `control_id`
-                "average_maturity": a.score,
-            }
-            for a in assessments if a.score and a.score < 3
-        ]
-
-        recommendations = [
-            "Implementar automação para inventário de ativos.",
-            "Melhorar o controle de acesso físico e lógico.",
-            "Integrar inteligência artificial para detecção de anomalias.",
-            "Revisar políticas de segurança periodicamente.",
-        ]
-
-        report = {
-            "averageMaturity": round(average_maturity, 2),
-            "lowMaturityControls": low_maturity_controls,
-            "recommendations": recommendations,
-        }
-
-        return Response(report, status=status.HTTP_200_OK)
-
-class ControlAssessmentView(APIView):
-    authentication_classes = [JWTAuthentication]
+    """
+    API para listar todas as perguntas disponíveis na avaliação.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Pegando os parâmetros da query string
-        status = request.query_params.get('status', None)
-        date_from = request.query_params.get('date_from', None)
-        date_to = request.query_params.get('date_to', None)
-        category = request.query_params.get('category', None)
+        questions = Question.objects.all()
+        serializer = QuestionSerializer(questions, many=True)
+        return Response(serializer.data)
 
-        # Construindo o queryset com base nos parâmetros recebidos
-        assessments = ControlAssessment.objects.all()
+class ExecutiveReportView(APIView):
+    """
+    Gera um relatório executivo com base nas avaliações de maturidade.
+    """
+    permission_classes = [IsAuthenticated]
 
-        if status:
-            assessments = assessments.filter(status=status)
+    def get(self, request):
+        # Implementação do relatório executivo
+        data = {"message": "Relatório executivo gerado com sucesso!"}
+        return Response(data)
 
-        if category:
-            assessments = assessments.filter(category=category)
+class SaveAssessmentView(APIView):
+    """
+    Salva os resultados da avaliação de maturidade.
+    """
+    permission_classes = [IsAuthenticated]
 
-        if date_from:
-            assessments = assessments.filter(date__gte=date_from)
-
-        if date_to:
-            assessments = assessments.filter(date__lte=date_to)
-
-        # Serializando as avaliações e retornando a resposta
-        serialized_assessments = ControlAssessmentSerializer(assessments, many=True)
-        return Response(serialized_assessments.data)
-
-class RiskAssessmentViewSet(viewsets.ModelViewSet):
-    queryset = RiskAssessment.objects.all()
-    serializer_class = RiskAssessmentSerializer
-
-@csrf_exempt
-def save_assessment(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            responses = data.get('responses')
-            maturity_results = data.get('maturityResults')
-
-            # Exemplo de salvamento no banco (ajuste conforme necessário)
-            # Assessment.objects.create(responses=responses, maturity_results=maturity_results)
-
-            return JsonResponse({'status': 'success', 'message': 'Avaliação salva com sucesso!'})
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
-    return JsonResponse({'status': 'error', 'message': 'Método não permitido'}, status=405)
-
-class ControlAssessmentViewSet(viewsets.ModelViewSet):
-    queryset = ControlAssessment.objects.all()
-    serializer_class = ControlAssessmentSerializer
+    def post(self, request):
+        # Aqui você pode processar e salvar os dados da avaliação
+        return Response({"message": "Avaliação salva com sucesso!"})

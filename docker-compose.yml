@@ -1,12 +1,12 @@
-name: futuresecurity
+name: futurecyberSec
 
 networks:
-  futuresecurity_network:
+  futurecybersec_network:
     driver: bridge
 
 services:
   frontend:
-    container_name: futuresecurity_frontend
+    container_name: futurecybersec_frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -17,14 +17,13 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
-    command: npm run dev  # Comando de desenvolvimento
+    command: npm run dev
     restart: always
     networks:
-      - futuresecurity_network
+      - futurecybersec_network
 
-    
   backend:
-    container_name: futuresecurity_backend
+    container_name: futurecybersec_backend
     build:
       context: .
       dockerfile: infra/docker/Dockerfile
@@ -33,31 +32,43 @@ services:
     volumes:
       - ./backend:/app
     command: >
-      sh -c "python manage.py migrate &&
+      sh -c "sleep 10 &&
+             python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
     environment:
       - ENV=development
-      - CHOKIDAR_USEPOLLING=true # Adiciona suporte a sistemas de arquivos que não detectam alterações (como em contêineres)
+      - CHOKIDAR_USEPOLLING=true
+      - POSTGRES_DB=cybersecurity_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=dU2q4Lpm12@#
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
     depends_on:
       - db
     restart: always
     networks:
-      - futuresecurity_network
+      - futurecybersec_network
 
   db:
     image: postgres:latest
-    container_name: futuresecurity_db
+    container_name: futurecybersec_db
     restart: always
     environment:
-      POSTGRES_DB: futuresecurity
+      POSTGRES_DB: cybersecurity_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: dU2q4Lpm12@#$
+      POSTGRES_HOST: db
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
-      - futuresecurity_network
+      - futurecybersec_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d cybersecurity_db" ]
+      interval: 10s
+      retries: 5
+      timeout: 5s
 
 volumes:
   db_data:

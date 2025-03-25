@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import bleach
 from datetime import timedelta
@@ -125,12 +126,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'cybersecurity_db',
+        'USER': 'postgres',
+        'PASSWORD': 'dU2q4Lpm12@#$',
+        'HOST': 'db',  # Deve corresponder ao nome do serviço no Docker ou ao hostname/IP real
+        'PORT': '5432',  # Porta padrão do PostgreSQL
     }
 }
 
