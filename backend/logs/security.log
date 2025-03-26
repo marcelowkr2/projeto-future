@@ -3140,3 +3140,4 @@ Traceback (most recent call last):
 django.db.utils.ProgrammingError: coluna assessments_question.created_at não existe
 LINE 1: ...ion"."category", "assessments_question"."weight", "assessmen...
                                                              ^
+WARNING 2025-03-26 19:36:57,726 log Forbidden (Origin checking failed - http://localhost:3000 does not match any trusted origins.): /assessments/submit/
