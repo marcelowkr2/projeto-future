@@ -51,15 +51,16 @@ services:
 
   db:
     image: postgres:latest
-    container_name: future2025_db
+    container_name: futurecyber_db
     restart: always
     environment:
       POSTGRES_DB: futurecyber_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: dU2q4Lpm12@#$
+      POSTGRES_HOST_AUTH_METHOD: trust 
 
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:

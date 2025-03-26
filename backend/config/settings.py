@@ -134,7 +134,7 @@ DATABASES = {
         "NAME": "futurecyber_db",
         "USER": "postgres",
         "PASSWORD": "dU2q4Lpm12@#$",
-        "HOST": "localhost",  # Deve corresponder ao nome do serviço no Docker ou ao hostname/IP real
+        "HOST": "db",  # Deve corresponder ao nome do serviço no Docker ou ao hostname/IP real
         "PORT": "5432",  # Porta padrão do PostgreSQL
     }
 }
