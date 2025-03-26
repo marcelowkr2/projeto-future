@@ -1,28 +1,34 @@
+// components/Question.js
 import React from "react";
+import styles from "../styles/Question.module.css";
 
 const Question = ({ question, response, handleResponseChange }) => {
   const { id, text, category } = question;
 
-  // Função para lidar com a mudança na seleção da resposta
   const handleSelectChange = (e) => {
-    const level = parseInt(e.target.value, 10); // Certifique-se de que o valor seja numérico
-    handleResponseChange(id, "politica", level); // Chama a função de mudança com o ID da questão
+    handleResponseChange(id, e.target.value);
   };
 
   return (
-    <div className="question-container">
-      <h3>{text}</h3>
-      <p><strong>Categoria:</strong> {category}</p>
-      <select
-        value={response?.politica || ""} // Define o valor da seleção baseado na resposta atual
-        onChange={handleSelectChange}
-      >
-        <option value="">Selecione</option>
-        <option value="1">Inicial</option>
-        <option value="2">Gerenciado</option>
-        <option value="3">Definido</option>
-        <option value="4">Otimizado</option>
-      </select>
+    <div className={styles.questionCard}>
+      <div className={styles.questionHeader}>
+        <span className={styles.questionCategory}>{category}</span>
+        <h3 className={styles.questionText}>{text}</h3>
+      </div>
+      
+      <div className={styles.responseOptions}>
+        <select
+          value={response || ""}
+          onChange={handleSelectChange}
+          className={styles.responseSelect}
+        >
+          <option value="">Selecione o nível de maturidade</option>
+          <option value="1">1 - Inicial (Ad-hoc)</option>
+          <option value="2">2 - Gerenciado (Reativo)</option>
+          <option value="3">3 - Definido (Proativo)</option>
+          <option value="4">4 - Otimizado (Melhorado Continuamente)</option>
+        </select>
+      </div>
     </div>
   );
 };

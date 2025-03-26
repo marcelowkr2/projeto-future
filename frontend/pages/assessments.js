@@ -1,84 +1,422 @@
-// Assessment.js
-import React, { useState, useEffect } from "react";
-import API from "../services/api";
-import Question from "../components/Question"; // Componente de pergunta
-import { getAuthToken } from "../utils/auth"; // Função para obter o token de autenticação
+import React, { useState, useEffect } from 'react';
+import API from '../services/api';
+import { getAuthToken } from '../utils/auth';
+import { Radar } from 'react-chartjs-2';
+import { 
+  Chart as ChartJS, 
+  RadialLinearScale, 
+  PointElement, 
+  LineElement, 
+  Filler, 
+  Tooltip, 
+  Legend 
+} from 'chart.js';
+import styles from '../styles/Assessment.module.css';
+
+// Registra os componentes do Chart.js
+ChartJS.register(
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend
+);
 
 const Assessment = () => {
-  const [questions, setQuestions] = useState([]); // Armazena as perguntas
-  const [responses, setResponses] = useState({}); // Armazena as respostas do usuário
-  const [loading, setLoading] = useState(true); // Estado para exibição de carregamento
-  const [error, setError] = useState(null); // Estado para exibição de erros
+  const [questions, setQuestions] = useState([]);
+  const [responses, setResponses] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [progress, setProgress] = useState(0);
+  const [report, setReport] = useState(null);
+  const [showReport, setShowReport] = useState(false);
+  const [categories, setCategories] = useState([]);
 
+  // Função para traduzir códigos de categoria
+  const getCategoryName = (code) => {
+    const names = {
+      "GV": "Governança",
+      "ID": "Identificar",
+      "PR": "Proteger",
+      "DE": "Detectar",
+      "RS": "Responder",
+      "RC": "Recuperar"
+    };
+    return names[code] || code;
+  };
+
+  // Carrega as questões da API
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const token = getAuthToken(); // Obtém o token do localStorage ou outro lugar
+        setLoading(true);
+        setError(null);
+        
+        const token = getAuthToken();
         if (!token) {
-          setError("Token JWT não encontrado. Por favor, faça login.");
-          return;
+          throw new Error('Token de autenticação não encontrado');
         }
 
-        // Requisição à API para obter as questões
-        const response = await API.get("api/assessments/", {
+        const response = await API.get('/assessments/questions/', {
           headers: {
-            Authorization: `Bearer ${token}`, // Envia o token JWT no cabeçalho
-          },
+            Authorization: `Bearer ${token}`
+          }
         });
 
-        console.log("Resposta da API:", response.data);
-
-        // Verifica se a resposta é uma lista de objetos e formata as perguntas
-        if (Array.isArray(response.data)) {
-          const formattedQuestions = response.data.map((q, index) => ({
-            id: index + 1, // Gera um ID com base no índice
-            category: q.category,
-            text: q.text,
-          }));
-          setQuestions(formattedQuestions); // Atualiza as perguntas no estado
-        } else {
-          throw new Error("Formato inesperado de resposta da API");
+        if (!response.data || !Array.isArray(response.data)) {
+          throw new Error('Formato de dados inválido da API');
         }
-      } catch (error) {
-        console.error("Erro ao buscar questões:", error);
-        setError("Erro ao carregar as questões. Verifique a API ou tente novamente mais tarde.");
+
+        setQuestions(response.data);
+        
+        // Extrai e define as categorias únicas
+        const uniqueCategories = [...new Set(
+          response.data.map(q => q.category.split('.')[0])
+        )];
+        setCategories(uniqueCategories);
+        
+        // Define a primeira categoria como ativa
+        if (uniqueCategories.length > 0) {
+          setActiveCategory(uniqueCategories[0]);
+        }
+      } catch (err) {
+        console.error('Erro ao carregar questões:', err);
+        setError(err.message || 'Erro ao carregar as questões. Tente recarregar a página.');
       } finally {
-        setLoading(false); // Finaliza o estado de carregamento
+        setLoading(false);
       }
     };
 
-    fetchQuestions(); // Chama a função para buscar as questões quando o componente for montado
-  }, []); // O array vazio garante que a requisição seja feita apenas uma vez
+    fetchQuestions();
+  }, []);
 
-  const handleResponseChange = (questionId, level) => {
-    setResponses((prevResponses) => ({
-      ...prevResponses,
-      [questionId]: level,
+  // Calcula o progresso das respostas
+  useEffect(() => {
+    if (questions.length > 0) {
+      const answered = Object.keys(responses).filter(
+        qId => responses[qId]?.politica && responses[qId]?.pratica
+      ).length;
+      setProgress(Math.round((answered / questions.length) * 100));
+    }
+  }, [responses, questions]);
+
+  // Manipula mudanças nas respostas
+  const handleResponseChange = (questionId, type, value) => {
+    setResponses(prev => ({
+      ...prev,
+      [questionId]: {
+        ...prev[questionId],
+        [type]: parseInt(value, 10)
+      }
     }));
   };
 
+  // Valida e envia as respostas
+  const handleSubmit = async () => {
+    try {
+      const unanswered = questions.filter(
+        q => !responses[q.id]?.politica || !responses[q.id]?.pratica
+      );
+      
+      if (unanswered.length > 0) {
+        alert(`Por favor, responda todas as perguntas antes de enviar. Faltam ${unanswered.length} perguntas.`);
+        return;
+      }
+
+      const token = getAuthToken();
+      const formattedResponses = Object.entries(responses).map(([questionId, values]) => ({
+        question: questionId,
+        ...values
+      }));
+
+      await API.post('/assessments/submit/', formattedResponses, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      alert('Respostas enviadas com sucesso!');
+    } catch (err) {
+      console.error('Erro ao enviar respostas:', err);
+      alert('Erro ao enviar respostas. Por favor, tente novamente.');
+    }
+  };
+
+  // Gera o relatório de conformidade
+  const generateReport = async () => {
+    try {
+      const token = getAuthToken();
+      const response = await API.get('/reports/lgpd_score/', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (!response.data) {
+        throw new Error('Dados do relatório não recebidos');
+      }
+      
+      setReport(response.data);
+      setShowReport(true);
+    } catch (err) {
+      console.error('Erro ao gerar relatório:', err);
+      alert('Erro ao gerar relatório. Verifique se todas as perguntas foram respondidas.');
+    }
+  };
+
+  // Configuração do gráfico radar
+  const radarData = {
+    labels: categories.map(getCategoryName),
+    datasets: [
+      {
+        label: 'Pontuação por Categoria',
+        data: categories.map(cat => report?.scores[cat]?.total || 0),
+        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+        borderColor: 'rgba(52, 152, 219, 1)',
+        borderWidth: 2,
+        pointBackgroundColor: 'rgba(52, 152, 219, 1)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(52, 152, 219, 1)',
+      },
+    ],
+  };
+
+  const radarOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      r: {
+        angleLines: {
+          display: true,
+          color: 'rgba(0, 0, 0, 0.1)'
+        },
+        suggestedMin: 0,
+        suggestedMax: 5,
+        ticks: {
+          stepSize: 1,
+          backdropColor: 'transparent'
+        },
+        grid: {
+          color: 'rgba(0, 0, 0, 0.1)'
+        },
+        pointLabels: {
+          font: {
+            size: 12
+          }
+        }
+      }
+    },
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            return `Score: ${context.raw}/5`;
+          }
+        }
+      }
+    }
+  };
+
   if (loading) {
-    return <p>Carregando questões...</p>;
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner}></div>
+        <p>Carregando questões...</p>
+      </div>
+    );
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return (
+      <div className={styles.errorContainer}>
+        <h3>Erro ao carregar a avaliação</h3>
+        <p>{error}</p>
+        <button 
+          onClick={() => window.location.reload()}
+          className={styles.retryButton}
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
   }
 
   return (
-    <div>
-      <h1>Avaliação de Maturidade</h1>
-      {questions.length > 0 ? (
-        questions.map((q) => (
-          <Question
-            key={q.id}
-            question={q}
-            response={responses[q.id]}
-            handleResponseChange={handleResponseChange}
-          />
-        ))
+    <div className={styles.container}>
+      <h1 className={styles.title}>Avaliação de Maturidade em LGPD</h1>
+      
+      {!showReport ? (
+        <>
+          <div className={styles.progressContainer}>
+            <div 
+              className={styles.progressBar} 
+              style={{ width: `${progress}%` }}
+            ></div>
+            <span className={styles.progressText}>
+              {progress}% completo ({Object.keys(responses).filter(
+                qId => responses[qId]?.politica && responses[qId]?.pratica
+              ).length}/{questions.length} perguntas)
+            </span>
+          </div>
+          
+          <div className={styles.categoryMenu}>
+            {categories.map(category => (
+              <button
+                key={category}
+                className={`${styles.categoryButton} ${
+                  activeCategory === category ? styles.active : ''
+                }`}
+                onClick={() => setActiveCategory(category)}
+              >
+                {getCategoryName(category)}
+              </button>
+            ))}
+          </div>
+          
+          <div className={styles.questionsContainer}>
+            {questions
+              .filter(q => q.category.startsWith(activeCategory))
+              .map(question => (
+                <div key={question.id} className={styles.questionCard}>
+                  <h3 className={styles.questionText}>{question.text}</h3>
+                  <p className={styles.questionCategory}>
+                    {question.category}
+                  </p>
+                  
+                  <div className={styles.responseSection}>
+                    <h4>Política</h4>
+                    <select
+                      value={responses[question.id]?.politica || ''}
+                      onChange={(e) => handleResponseChange(
+                        question.id, 
+                        'politica', 
+                        e.target.value
+                      )}
+                      className={styles.responseSelect}
+                    >
+                      <option value="">Selecione o nível</option>
+                      <option value="1">1 - Inicial</option>
+                      <option value="2">2 - Repetido</option>
+                      <option value="3">3 - Definido</option>
+                      <option value="4">4 - Gerenciado</option>
+                      <option value="5">5 - Otimizado</option>
+                    </select>
+                  </div>
+                  
+                  <div className={styles.responseSection}>
+                    <h4>Prática</h4>
+                    <select
+                      value={responses[question.id]?.pratica || ''}
+                      onChange={(e) => handleResponseChange(
+                        question.id, 
+                        'pratica', 
+                        e.target.value
+                      )}
+                      className={styles.responseSelect}
+                    >
+                      <option value="">Selecione o nível</option>
+                      <option value="1">1 - Inicial</option>
+                      <option value="2">2 - Repetido</option>
+                      <option value="3">3 - Definido</option>
+                      <option value="4">4 - Gerenciado</option>
+                      <option value="5">5 - Otimizado</option>
+                    </select>
+                  </div>
+                </div>
+              ))}
+          </div>
+          
+          <div className={styles.buttonsContainer}>
+            <button 
+              onClick={handleSubmit}
+              className={styles.submitButton}
+            >
+              Salvar Respostas
+            </button>
+            
+            <button 
+              onClick={generateReport}
+              className={styles.reportButton}
+              disabled={progress < 100}
+              title={progress < 100 ? 'Responda todas as perguntas para gerar o relatório' : ''}
+            >
+              Gerar Relatório LGPD
+            </button>
+          </div>
+        </>
       ) : (
-        <p>Nenhuma questão disponível no momento.</p>
+        <div className={styles.reportContainer}>
+          <h2 className={styles.reportTitle}>
+            Relatório de Conformidade com a LGPD
+          </h2>
+          
+          <div className={styles.scoreSummary}>
+            <div className={styles.scoreCard}>
+              <h3>Score Geral de Conformidade</h3>
+              <div className={`${styles.scoreValue} ${
+                report.is_compliant ? styles.compliant : styles.notCompliant
+              }`}>
+                {report.lgpd_score.toFixed(1)}/5.0
+              </div>
+              <p className={styles.complianceStatus}>
+                Status: {report.is_compliant ? (
+                  <span className={styles.compliant}>Conforme</span>
+                ) : (
+                  <span className={styles.notCompliant}>Não Conforme</span>
+                )}
+              </p>
+              <p className={styles.scoreDescription}>
+                {report.is_compliant
+                  ? 'Sua organização está em conformidade com os requisitos básicos da LGPD'
+                  : 'Sua organização precisa melhorar seus processos para atender à LGPD'}
+              </p>
+            </div>
+            
+            <div className={styles.radarChartContainer}>
+              <Radar 
+                data={radarData} 
+                options={radarOptions} 
+                height={400}
+              />
+            </div>
+          </div>
+          
+          <div className={styles.detailedScores}>
+            <h3>Pontuação por Categoria</h3>
+            <div className={styles.scoresGrid}>
+              {categories.map(category => (
+                <div key={category} className={styles.categoryScore}>
+                  <h4>{getCategoryName(category)}</h4>
+                  <p>Política: {report.scores[category]?.politica?.toFixed(1) || '0.0'}/5</p>
+                  <p>Prática: {report.scores[category]?.pratica?.toFixed(1) || '0.0'}/5</p>
+                  <p>Total: {report.scores[category]?.total?.toFixed(1) || '0.0'}/5</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className={styles.recommendations}>
+            <h3>Recomendações para Melhoria</h3>
+            {report.recommendations.length > 0 ? (
+              <ul>
+                {report.recommendations.map((rec, index) => (
+                  <li key={index}>{rec}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>Sua organização está com boas práticas em todas as categorias!</p>
+            )}
+          </div>
+          
+          <button 
+            onClick={() => setShowReport(false)}
+            className={styles.backButton}
+          >
+            Voltar para as Perguntas
+          </button>
+        </div>
       )}
     </div>
   );

@@ -1,0 +1,38 @@
+/* styles/Question.module.css */
+.questionCard {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .questionHeader {
+    margin-bottom: 15px;
+  }
+  
+  .questionCategory {
+    display: inline-block;
+    background-color: #3498db;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+  
+  .questionText {
+    margin: 0;
+    color: #2c3e50;
+  }
+  
+  .responseOptions {
+    margin-top: 15px;
+  }
+  
+  .responseSelect {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+  }

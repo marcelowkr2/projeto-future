@@ -104,7 +104,9 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',  # Adiciona a URL do frontend
-]                   
+]  
+
+CORS_ALLOW_ALL_ORIGINS = True # ¡Atenção! Nunca use em produção.
 
 ROOT_URLCONF = 'config.urls'
 
@@ -134,7 +136,7 @@ DATABASES = {
         "NAME": "futurecyber_db",
         "USER": "postgres",
         "PASSWORD": "dU2q4Lpm12@#$",
-        "HOST": "db",  # Deve corresponder ao nome do serviço no Docker ou ao hostname/IP real
+        "HOST": "localhost",  # Deve corresponder ao nome do serviço no Docker ou ao hostname/IP real
         "PORT": "5432",  # Porta padrão do PostgreSQL
     }
 }

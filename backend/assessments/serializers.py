@@ -2,6 +2,13 @@ from rest_framework import serializers
 from .models import ControlAssessment, Answer, Question
 from rest_framework import serializers
 from .models import RiskAssessment
+from .models import AssessmentResponse
+
+class AssessmentResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssessmentResponse
+        fields = ['id', 'user', 'question', 'politica', 'pratica', 'created_at']
+        read_only_fields = ['user', 'created_at']
 
 class RiskAssessmentSerializer(serializers.ModelSerializer):
     class Meta:

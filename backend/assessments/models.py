@@ -1,5 +1,29 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class AssessmentResponse(models.Model):
+    LEVEL_CHOICES = [
+        (1, 'Inicial'),
+        (2, 'Repetido'),
+        (3, 'Definido'),
+        (4, 'Gerenciado'),
+        (5, 'Otimizado'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    question = models.ForeignKey('Question', on_delete=models.CASCADE)
+    politica = models.IntegerField(choices=LEVEL_CHOICES)
+    pratica = models.IntegerField(choices=LEVEL_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'question')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.question.text}"
 
 class Question(models.Model):
     CATEGORY_CHOICES = [
@@ -20,8 +44,8 @@ class Question(models.Model):
     ]
 
     text = models.TextField()  # Texto da pergunta
-    category = models.CharField(max_length=2, choices=CATEGORY_CHOICES)
-    weight = models.DecimalField(max_digits=5, decimal_places=2, default=1.0)  # Peso da pergunta
+    category = models.CharField(max_length=1000, choices=CATEGORY_CHOICES)
+    weight = models.DecimalField(max_digits=500, decimal_places=2, default=1.0)  # Peso da pergunta
 
     def __str__(self):
         return f"{self.get_category_display()} - {self.text[:30]}..."
@@ -71,7 +95,7 @@ class ControlAssessment(models.Model):
 
 
 class RiskAssessment(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=500)
     description = models.TextField()
     score = models.IntegerField()
     category = models.CharField(max_length=100, choices=[('high', 'Alta'), ('medium', 'Média'), ('low', 'Baixa')])
