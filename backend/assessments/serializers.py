@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from .models import ControlAssessment, Answer, Question
 from rest_framework import serializers
-from .models import RiskAssessment
-from .models import AssessmentResponse
+from assessments.models import RiskAssessment
+from assessments.models import AssessmentResponse
 
 class AssessmentResponseSerializer(serializers.ModelSerializer):
     class Meta:

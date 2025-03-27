@@ -3141,3 +3141,13 @@ django.db.utils.ProgrammingError: coluna assessments_question.created_at não exi
 LINE 1: ...ion"."category", "assessments_question"."weight", "assessmen...
                                                              ^
 WARNING 2025-03-26 19:36:57,726 log Forbidden (Origin checking failed - http://localhost:3000 does not match any trusted origins.): /assessments/submit/
+WARNING 2025-03-26 20:09:55,153 log Forbidden (Origin checking failed - http://localhost:3000 does not match any trusted origins.): /assessments/submit/
+WARNING 2025-03-26 20:15:52,362 log Forbidden (CSRF cookie not set.): /assessments/submit/
+WARNING 2025-03-26 20:16:16,495 log Forbidden (CSRF cookie not set.): /assessments/submit/
+WARNING 2025-03-26 20:17:09,446 log Forbidden (CSRF cookie not set.): /assessments/submit/
+WARNING 2025-03-26 20:30:25,927 log Forbidden (CSRF cookie not set.): /assessments/submit/
+WARNING 2025-03-26 21:47:53,844 log Forbidden (CSRF cookie not set.): /assessments/submit/
+WARNING 2025-03-26 21:53:15,082 log Forbidden (CSRF cookie not set.): /assessments/submit/
+WARNING 2025-03-26 21:53:20,337 log Forbidden (CSRF cookie not set.): /assessments/submit/
+WARNING 2025-03-26 22:02:29,544 log Forbidden (CSRF cookie not set.): /assessments/submit/
+WARNING 2025-03-27 07:16:38,757 log Forbidden (CSRF cookie not set.): /assessments/submit/

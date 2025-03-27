@@ -124,18 +124,27 @@ const Assessment = () => {
         alert(`Por favor, responda todas as perguntas antes de enviar. Faltam ${unanswered.length} perguntas.`);
         return;
       }
-
+  
       const token = getAuthToken();
+      const csrfToken = document.cookie.split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+  
       const formattedResponses = Object.entries(responses).map(([questionId, values]) => ({
         question: questionId,
         ...values
       }));
-
-      await API.post('/assessments/submit/', formattedResponses, {
-        headers: { Authorization: `Bearer ${token}` }
+  
+      const response = await API.post('/assessments/submit/', formattedResponses, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'X-CSRFToken': csrfToken 
+        }
       });
       
-      alert('Respostas enviadas com sucesso!');
+      if (response.status === 200) {
+        alert('Respostas enviadas com sucesso!');
+      }
     } catch (err) {
       console.error('Erro ao enviar respostas:', err);
       alert('Erro ao enviar respostas. Por favor, tente novamente.');
@@ -353,68 +362,14 @@ const Assessment = () => {
           </h2>
           
           <div className={styles.scoreSummary}>
-            <div className={styles.scoreCard}>
-              <h3>Score Geral de Conformidade</h3>
-              <div className={`${styles.scoreValue} ${
-                report.is_compliant ? styles.compliant : styles.notCompliant
-              }`}>
-                {report.lgpd_score.toFixed(1)}/5.0
-              </div>
-              <p className={styles.complianceStatus}>
-                Status: {report.is_compliant ? (
-                  <span className={styles.compliant}>Conforme</span>
-                ) : (
-                  <span className={styles.notCompliant}>Não Conforme</span>
-                )}
-              </p>
-              <p className={styles.scoreDescription}>
-                {report.is_compliant
-                  ? 'Sua organização está em conformidade com os requisitos básicos da LGPD'
-                  : 'Sua organização precisa melhorar seus processos para atender à LGPD'}
-              </p>
-            </div>
-            
-            <div className={styles.radarChartContainer}>
-              <Radar 
-                data={radarData} 
-                options={radarOptions} 
-                height={400}
-              />
-            </div>
-          </div>
-          
-          <div className={styles.detailedScores}>
-            <h3>Pontuação por Categoria</h3>
-            <div className={styles.scoresGrid}>
-              {categories.map(category => (
-                <div key={category} className={styles.categoryScore}>
-                  <h4>{getCategoryName(category)}</h4>
-                  <p>Política: {report.scores[category]?.politica?.toFixed(1) || '0.0'}/5</p>
-                  <p>Prática: {report.scores[category]?.pratica?.toFixed(1) || '0.0'}/5</p>
-                  <p>Total: {report.scores[category]?.total?.toFixed(1) || '0.0'}/5</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <div className={styles.recommendations}>
-            <h3>Recomendações para Melhoria</h3>
-            {report.recommendations.length > 0 ? (
-              <ul>
-                {report.recommendations.map((rec, index) => (
-                  <li key={index}>{rec}</li>
-                ))}
-              </ul>
-            ) : (
-              <p>Sua organização está com boas práticas em todas as categorias!</p>
-            )}
+            <Radar data={radarData} options={radarOptions} height={400} />
           </div>
           
           <button 
-            onClick={() => setShowReport(false)}
+            onClick={() => setShowReport(false)} 
             className={styles.backButton}
           >
-            Voltar para as Perguntas
+            Voltar para a avaliação
           </button>
         </div>
       )}

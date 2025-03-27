@@ -24,5 +24,6 @@ urlpatterns = [
     path('', include(router.urls)),  # Inclui todas as rotas do router
     path('save-assessment/', SaveAssessmentView.as_view(), name='save-assessment'),
     path('executive-report/', ExecutiveReportView.as_view(), name='executive-report'),
-    path('submit/', SubmitReportView.as_view(), name='submit-report'),
+    path('submit/', SubmitReportView.as_view(), name='submit-report'),  # Rota para o SubmitReportView
+    path('reports/lgpd_score/', ReportViewSet.as_view({'get': 'list'}), name='lgpd-score'),  # Adicionando a rota para lgpd_score
 ]

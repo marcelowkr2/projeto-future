@@ -83,6 +83,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.TokenAuthentication',
+         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -170,7 +171,7 @@ USE_TZ = True
 
 #CSRF_COOKIE_SECURE = True  # ✅ Garante que o cookie só seja enviado via HTTPS
 CSRF_COOKIE_HTTPONLY = True  # ✅ Evita que JavaScript acesse o cookie CSRF
-CSRF_TRUSTED_ORIGINS = ['https://seu-dominio.com']  # 🔹 Substitua pelo domínio do seu projeto
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000",]  # 🔹 Substitua pelo domínio do seu projeto
 
 SECURE_BROWSER_XSS_FILTER = True  # ✅ Proteção contra XSS
 X_FRAME_OPTIONS = 'DENY'  # ✅ Bloqueia ataques de Clickjacking
