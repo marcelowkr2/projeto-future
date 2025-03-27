@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import action
-from django.db.models import Avg, Q
+from django.db.models import Avg
 from .models import ControlAssessment, RiskAssessment, Question, AssessmentResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator

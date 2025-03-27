@@ -155,7 +155,7 @@ const Assessment = () => {
   const generateReport = async () => {
     try {
       const token = getAuthToken();
-      const response = await API.get('/reports/lgpd_score/', {
+      const response = await API.get('/assessments/reports/lgpd_score/', {
         headers: { Authorization: `Bearer ${token}` }
       });
       
