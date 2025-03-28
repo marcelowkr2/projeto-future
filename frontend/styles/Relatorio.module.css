@@ -1,0 +1,177 @@
+/* Container principal do relatório */
+.relatorioContainer {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    margin-top: 30px;
+  }
+  
+  .relatorioContainer h2 {
+    color: #1976d2;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.6rem;
+    border-bottom: 2px solid #e3f2fd;
+    padding-bottom: 15px;
+  }
+  
+  /* Seção de nível */
+  .nivelSection {
+    background: #f5f9ff;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+  }
+  
+  .nivelSection h3 {
+    margin-top: 0;
+    color: #0d47a1;
+    font-size: 1.2rem;
+  }
+  
+  .nivelInfo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+  
+  .nivelInfo p {
+    margin: 8px 0;
+    font-size: 0.95rem;
+  }
+  
+  .nivelInfo strong {
+    color: #1565c0;
+  }
+  
+  /* Seção de recomendações */
+  .recomendacaoSection {
+    margin-bottom: 30px;
+  }
+  
+  .recomendacaoSection h3 {
+    color: #1976d2;
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e3f2fd;
+  }
+  
+  .recomendacaoBox {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #2196f3;
+  }
+  
+  .recomendacaoBox h4 {
+    color: #1565c0;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+  }
+  
+  .recomendacaoBox ul {
+    padding-left: 0;
+    list-style-type: none;
+  }
+  
+  .recomendacaoBox li {
+    margin-bottom: 10px;
+    padding-left: 25px;
+    position: relative;
+    line-height: 1.5;
+  }
+  
+  .recomendacaoNumber {
+    position: absolute;
+    left: 0;
+    color: #1976d2;
+    font-weight: bold;
+  }
+  
+  /* Seção de investimento */
+  .investimentoBox {
+    background: #e8f5e9;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 30px;
+  }
+  
+  .investimentoBox h4 {
+    margin-top: 0;
+    color: #2e7d32;
+    font-size: 1.1rem;
+  }
+  
+  .investimentoBox p {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #1b5e20;
+    margin: 10px 0;
+  }
+  
+  .investimentoDetail {
+    font-size: 0.8rem;
+    color: #689f38;
+    font-style: italic;
+    margin: 5px 0 0;
+  }
+  
+  /* Seção de IA */
+  .iaSection {
+    background: #fff8e1;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #ffc107;
+    margin-top: 30px;
+  }
+  
+  .iaContainer {
+    min-height: 60px;
+  }
+  
+  .loadingIA {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .loadingIA .spinner {
+    border: 3px solid #fff8e1;
+    border-top: 3px solid #ffa000;
+    width: 20px;
+    height: 20px;
+  }
+  
+  .loadingIA p {
+    margin: 0;
+    color: #ff8f00;
+    font-size: 0.9rem;
+  }
+  
+  .iaContent h4 {
+    color: #ff8f00;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  
+  .iaContent p {
+    margin: 0;
+    line-height: 1.6;
+  }
+  
+  .iaTips {
+    background: rgba(255, 167, 38, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 15px;
+    font-size: 0.9rem;
+  }
+  
+  .iaTips p {
+    margin: 0;
+    color: #e65100;
+  }

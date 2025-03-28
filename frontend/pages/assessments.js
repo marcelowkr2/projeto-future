@@ -11,17 +11,11 @@ import {
   Tooltip, 
   Legend 
 } from 'chart.js';
+import RelatorioRecomendacoes from '../components/RelatorioRecomendacoes';
 import styles from '../styles/Assessment.module.css';
 
-// Registra os componentes do Chart.js
-ChartJS.register(
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend
-);
+// Registro do ChartJS
+ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
 const Assessment = () => {
   const [questions, setQuestions] = useState([]);
@@ -34,6 +28,7 @@ const Assessment = () => {
   const [showReport, setShowReport] = useState(false);
   const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [unansweredQuestions, setUnansweredQuestions] = useState([]);
 
   // Função para traduzir códigos de categoria
   const getCategoryName = (code) => {
@@ -124,13 +119,14 @@ const Assessment = () => {
         const response = responses[q.id];
         return !response?.politica || !response?.pratica;
       });
-  
+
       if (unanswered.length > 0) {
+        setUnansweredQuestions(unanswered);
+        window.scrollTo(0, 0);
         
         // Cria mensagem detalhada
         let alertMessage = `Por favor, responda todas as perguntas antes de enviar.\n\nFaltam ${unanswered.length} perguntas:\n\n`;
         
-        // Adiciona cada pergunta faltante à mensagem
         unanswered.forEach((q, index) => {
           const categoryName = getCategoryName(q.category.split('.')[0]);
           alertMessage += `${index + 1}. [${categoryName}] ${q.text}\n`;
@@ -142,18 +138,12 @@ const Assessment = () => {
           
           alertMessage += `   (Faltando: ${missingFields.join(' e ')})\n\n`;
         });
-  
+
         alert(alertMessage);
         return;
       }
-  
-      const token = getAuthToken();
-      if (!token) {
-        alert('Sua sessão expirou. Por favor, faça login novamente.');
-        window.location.href = '/login';
-        return;
-      }
 
+      const token = getAuthToken();
       const csrfToken = document.cookie.split('; ')
         .find(row => row.startsWith('csrftoken='))
         ?.split('=')[1];
@@ -399,6 +389,43 @@ const Assessment = () => {
 
       {/* Container principal */}
       <div className={styles.container}>
+        {/* Alerta de perguntas não respondidas */}
+        {unansweredQuestions.length > 0 && (
+          <div className={styles.unansweredAlert}>
+            <h3>Perguntas não respondidas:</h3>
+            <ul>
+              {unansweredQuestions.map((q, index) => {
+                const missingFields = [];
+                if (!responses[q.id]?.politica) missingFields.push('Política');
+                if (!responses[q.id]?.pratica) missingFields.push('Prática');
+                
+                return (
+                  <li key={index}>
+                    <strong>{q.text}</strong>
+                    <span> (Faltando: {missingFields.join(' e ')})</span>
+                    <button 
+                      onClick={() => {
+                        document.getElementById(`question-${q.id}`)?.scrollIntoView({
+                          behavior: 'smooth'
+                        });
+                      }}
+                      className={styles.jumpToButton}
+                    >
+                      Ir para pergunta
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+            <button 
+              onClick={() => setUnansweredQuestions([])}
+              className={styles.closeButton}
+            >
+              Fechar
+            </button>
+          </div>
+        )}
+
         <h1 className={styles.title}>Avaliação de Maturidade em LGPD</h1>
         
         {!showReport ? (
@@ -421,7 +448,11 @@ const Assessment = () => {
               {questions
                 .filter(q => q.category.startsWith(activeCategory))
                 .map(question => (
-                  <div key={question.id} className={styles.questionCard}>
+                  <div 
+                    key={question.id} 
+                    className={styles.questionCard}
+                    id={`question-${question.id}`}
+                  >
                     <h3 className={styles.questionText}>{question.text}</h3>
                     <p className={styles.questionCategory}>
                       {question.category}
@@ -500,26 +531,7 @@ const Assessment = () => {
                 <Radar data={radarData} options={radarOptions} />
               </div>
               
-              <div className={styles.legendContainer}>
-                <h3>Legenda do Nível de Maturidade:</h3>
-                <ul className={styles.maturityLevels}>
-                  <li><strong>5 - Otimizado:</strong> Processos continuamente melhorados</li>
-                  <li><strong>4 - Gerenciado:</strong> Processos medidos e controlados</li>
-                  <li><strong>3 - Definido:</strong> Processos documentados e padronizados</li>
-                  <li><strong>2 - Repetido:</strong> Processos informais e ad hoc</li>
-                  <li><strong>1 - Inicial:</strong> Processos não existentes ou caóticos</li>
-                </ul>
-                
-                <h3>Domínios NIST:</h3>
-                <ul className={styles.nistDomains}>
-                  <li><strong>GV - Governança:</strong> Estrutura de privacidade organizacional</li>
-                  <li><strong>ID - Identificar:</strong> Mapeamento de dados e riscos</li>
-                  <li><strong>PR - Proteger:</strong> Controles de segurança de dados</li>
-                  <li><strong>DE - Detectar:</strong> Monitoramento de eventos de privacidade</li>
-                  <li><strong>RS - Responder:</strong> Plano de resposta a incidentes</li>
-                  <li><strong>RC - Recuperar:</strong> Plano de recuperação pós-incidente</li>
-                </ul>
-              </div>
+              <RelatorioRecomendacoes scores={report.scores} />
             </div>
             
             <button 
