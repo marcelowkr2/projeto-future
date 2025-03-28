@@ -1,9 +1,5 @@
 # 2024_2_Future_Projeto_Avaliacao_Maturidade_Seguranca_PPSI
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/efaea5cf-122e-4625-8c37-c25d2a923c30" alt="image" width="500">
-</p>
-
 🚀 Este projeto visa avaliar a maturidade de segurança do sistema PPSI, implementando melhores práticas e técnicas de segurança em diferentes camadas do sistema. O projeto será dividido em duas partes principais: o **frontend** e o **backend**. A arquitetura do projeto seguirá uma estrutura modular e escalável, visando facilitar o desenvolvimento e a manutenção contínua.
 
 ## 📂 Estrutura do Projeto
