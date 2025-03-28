@@ -138,11 +138,3 @@ A aplicação possui um conjunto robusto de testes automatizados, garantindo a f
 
 Toda a documentação do projeto será armazenada no diretório `docs`. No momento, ainda está em desenvolvimento e será disponibilizada conforme o projeto avançar.
 
-## 👨‍💻 Equipe de Desenvolvimento
-
-- 🏅 **[@gabiiwa](https://github.com/gabiiwa)** - Gabriele Iwashima (Instrutora)
-- 👩‍💻 **[@Mixchelle](https://github.com/Mixchelle)** - Michelle Marquez
-- 👨‍💻 **[@marcelowkr2](https://github.com/marcelowkr2)** - Marcelo Pires de Oliveira
-- 👨‍💻 **[@Nakamura1997](https://github.com/Nakamura1997)** - João Victor Oliveira Nakamura
-- 👨‍💻 **[@coder-marllon](https://github.com/coder-marllon)** - Marllon Lima
-- 👩‍💻 **[@IanaCastellain](https://github.com/IanaCastellain)** - Iana Castellain
