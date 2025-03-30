@@ -474,18 +474,25 @@ const Assessment = () => {
             <RelatorioRecomendacoes report={report} />
 
             {radarImage && (
-              <PDFDownloadLink
-                document={<PDFGenerator report={report} radarImage={radarImage} />}
-                fileName={`relatorio_lgpd_${new Date().toISOString().slice(0,10)}.pdf`}
-                className={styles.pdfLink}
-              >
-                {({ loading }) => (
-                  <button className={styles.pdfButton}>
-                    {loading ? 'Preparando PDF...' : 'Baixar Relatório PDF'}
-                  </button>
-                )}
-              </PDFDownloadLink>
-            )}
+  <PDFDownloadLink
+    document={
+      <PDFGenerator
+        report={report}
+        radarImage={radarImage}
+        questions={questions}
+        responses={responses}
+      />
+    }
+    fileName={`relatorio_lgpd_${new Date().toISOString().slice(0,10)}.pdf`}
+    className={styles.pdfLink}
+  >
+    {({ loading }) => (
+      <button className={styles.pdfButton}>
+        {loading ? 'Preparando PDF...' : 'Baixar Relatório PDF'}
+      </button>
+    )}
+  </PDFDownloadLink>
+)}
           </div>
         )}
       </div>

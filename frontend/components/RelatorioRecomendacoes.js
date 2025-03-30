@@ -248,7 +248,7 @@ function getFeedbackPositivo(categoria, score) {
   } else if (score.pratica - score.politica > 0.5) {
     feedback += " Considere documentar melhor as práticas existentes em políticas formais.";
   }
-
+  
   return feedback;
 }
 
