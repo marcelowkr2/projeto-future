@@ -1,9 +1,5 @@
 # 2024_2_Future_Projeto_Avaliacao_Maturidade_Seguranca_PPSI
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/efaea5cf-122e-4625-8c37-c25d2a923c30" alt="image" width="500">
-</p>
-
 🚀 Este projeto visa avaliar a maturidade de segurança do sistema PPSI, implementando melhores práticas e técnicas de segurança em diferentes camadas do sistema. O projeto será dividido em duas partes principais: o **frontend** e o **backend**. A arquitetura do projeto seguirá uma estrutura modular e escalável, visando facilitar o desenvolvimento e a manutenção contínua.
 
 ## 📂 Estrutura do Projeto
@@ -142,11 +138,3 @@ A aplicação possui um conjunto robusto de testes automatizados, garantindo a f
 
 Toda a documentação do projeto será armazenada no diretório `docs`. No momento, ainda está em desenvolvimento e será disponibilizada conforme o projeto avançar.
 
-## 👨‍💻 Equipe de Desenvolvimento
-
-- 🏅 **[@gabiiwa](https://github.com/gabiiwa)** - Gabriele Iwashima (Instrutora)
-- 👩‍💻 **[@Mixchelle](https://github.com/Mixchelle)** - Michelle Marquez
-- 👨‍💻 **[@marcelowkr2](https://github.com/marcelowkr2)** - Marcelo Pires de Oliveira
-- 👨‍💻 **[@Nakamura1997](https://github.com/Nakamura1997)** - João Victor Oliveira Nakamura
-- 👨‍💻 **[@coder-marllon](https://github.com/coder-marllon)** - Marllon Lima
-- 👩‍💻 **[@IanaCastellain](https://github.com/IanaCastellain)** - Iana Castellain

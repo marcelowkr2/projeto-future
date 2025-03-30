@@ -13,14 +13,17 @@
         "@emotion/styled": "^11.14.0",
         "@mui/icons-material": "^6.4.4",
         "@mui/material": "^6.4.4",
+        "@react-pdf/renderer": "^4.3.0",
         "axios": "^1.8.4",
         "chart.js": "^4.4.7",
+        "html2canvas": "^1.4.1",
         "next": "^15.2.3",
         "nodemon": "^3.1.9",
         "react": "latest",
         "react-chartjs-2": "^5.3.0",
         "react-dom": "latest",
         "react-paginate": "^8.3.0",
+        "react-pdf-charts": "^0.4.2",
         "recharts": "^2.15.1"
     },
     "devDependencies": {

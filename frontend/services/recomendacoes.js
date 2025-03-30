@@ -1,134 +1,210 @@
-export const recomendacoesPorNivel = {
-  1: {
-    titulo: "Recomendações para Nível Inicial",
-    politicas: [
-      "Desenvolver políticas formais de proteção de dados alinhadas com a LGPD",
-      "Criar um comitê de privacidade e proteção de dados",
-      "Estabelecer um programa básico de conscientização sobre privacidade",
-      "Definir responsáveis pelo tratamento de dados (DPO)"
+// Mapeamento de nomes de categorias
+const categoryNames = {
+  "GV": "Governança",
+  "ID": "Identificar",
+  "PR": "Proteger",
+  "DE": "Detectar",
+  "RS": "Responder",
+  "RC": "Recuperar"
+};
+
+export const getCategoryName = (code) => categoryNames[code] || code;
+
+// Recomendações baseadas em critérios específicos
+const recomendacoesPorCategoria = {
+  GV: {
+    baixo: [
+      "Criar política formal de governança de dados",
+      "Designar um Encarregado de Dados (DPO)",
+      "Estabelecer comitê de privacidade"
     ],
-    praticas: [
-      "Mapear todos os fluxos de dados pessoais na organização",
-      "Identificar e documentar os ativos de dados críticos",
-      "Implementar controles básicos de segurança da informação",
-      "Criar um registro de operações de dados pessoais"
+    medio: [
+      "Atualizar política de governança",
+      "Realizar treinamentos regulares para o comitê",
+      "Implementar sistema de monitoramento de conformidade"
     ],
-    equipamentos: [
-      "Firewalls básicos para proteção de rede",
-      "Antivírus corporativo",
-      "Sistema de backup inicial",
-      "Ferramentas básicas de controle de acesso"
-    ],
-    investimento: "Baixo (até R$ 20.000)"
-  },
-  2: {
-    titulo: "Recomendações para Nível Repetido",
-    politicas: [
-      "Atualizar políticas existentes conforme novas regulamentações",
-      "Implementar processo formal de revisão anual de políticas",
-      "Estabelecer diretrizes para tratamento de exceções",
-      "Criar política de retenção e descarte de dados"
-    ],
-    praticas: [
-      "Documentar processos existentes de proteção de dados",
-      "Realizar avaliações periódicas de conformidade",
-      "Implementar treinamentos regulares para colaboradores",
-      "Estabelecer processo de notificação de incidentes"
-    ],
-    equipamentos: [
-      "Soluções de criptografia para dados sensíveis",
-      "Sistema de detecção básico de intrusões (IDS)",
-      "Ferramentas de monitoramento de rede",
-      "Sistema de gerenciamento de vulnerabilidades básico"
-    ],
-    investimento: "Moderado (R$ 20.000 - R$ 100.000)"
-  },
-  3: {
-    titulo: "Recomendações para Nível Definido",
-    politicas: [
-      "Implementar sistema de gestão de privacidade documentado",
-      "Estabelecer métricas para avaliação de políticas",
-      "Criar procedimentos para tratamento de exceções",
-      "Implementar política de avaliação de fornecedores"
-    ],
-    praticas: [
-      "Automatizar partes do processo de conformidade",
-      "Implementar sistema de gestão de consentimento",
-      "Realizar avaliações de impacto regularmente",
-      "Documentar evidências de conformidade de forma sistemática"
-    ],
-    equipamentos: [
-      "Ferramentas de DLP (Prevenção de Perda de Dados)",
-      "Sistemas de SIEM básicos",
-      "Plataforma de gestão de consentimento",
-      "Ferramentas de automação de conformidade"
-    ],
-    investimento: "Intermediário (R$ 100.000 - R$ 300.000)"
-  },
-  4: {
-    titulo: "Recomendações para Nível Gerenciado",
-    politicas: [
-      "Integrar políticas de privacidade com estratégia de negócios",
-      "Implementar revisões contínuas de políticas",
-      "Estabelecer métricas avançadas de desempenho",
-      "Criar políticas específicas por departamento"
-    ],
-    praticas: [
-      "Implementar monitoramento contínuo de conformidade",
-      "Automatizar coleta de evidências de conformidade",
+    alto: [
+      "Implementar governança como parte da estratégia organizacional",
       "Realizar benchmarking com melhores práticas do setor",
-      "Implementar programa avançado de treinamentos"
-    ],
-    equipamentos: [
-      "Sistemas de SIEM avançados",
-      "Plataformas integradas de governança de dados",
-      "Ferramentas de análise de comportamento do usuário (UEBA)",
-      "Soluções de orquestração de segurança"
-    ],
-    investimento: "Alto (R$ 300.000 - R$ 500.000)"
+      "Automatizar processos de monitoramento de conformidade"
+    ]
   },
-  5: {
-    titulo: "Recomendações para Nível Otimizado",
-    politicas: [
-      "Manter processo contínuo de melhoria de políticas",
-      "Implementar análise preditiva de riscos à privacidade",
-      "Integrar políticas de privacidade com estratégia de negócios",
-      "Estabelecer políticas proativas baseadas em inteligência de ameaças"
+  ID: {
+    baixo: [
+      "Mapear todos os fluxos de dados pessoais",
+      "Identificar sistemas que processam dados pessoais",
+      "Criar inventário de dados pessoais"
     ],
-    praticas: [
-      "Automatizar completamente a coleta de evidências de conformidade",
-      "Implementar análise avançada de métricas de privacidade",
-      "Manter programa contínuo de inovação em privacidade",
-      "Implementar processos de autorremediação"
+    medio: [
+      "Atualizar mapeamento de fluxos de dados trimestralmente",
+      "Classificar dados por nível de sensibilidade",
+      "Implementar ferramenta de descoberta de dados"
     ],
-    equipamentos: [
-      "Soluções avançadas de IA para proteção de dados",
-      "Sistemas de prevenção de perda de dados (DLP) com machine learning",
+    alto: [
+      "Automatizar descoberta e classificação de dados",
+      "Integrar inventário de dados com sistemas de segurança",
+      "Implementar análise contínua de riscos à privacidade"
+    ]
+  },
+  // [...] (adicionar outras categorias seguindo o mesmo padrão)
+};
+
+// Gerador de recomendações personalizadas
+export const getRecomendacoesPersonalizadas = (responses, questions) => {
+  // 1. Calcular scores por categoria
+  const scores = {};
+  const categorias = {};
+
+  // Agrupar perguntas por categoria
+  questions.forEach(question => {
+    const categoria = question.category.split('.')[0];
+    if (!categorias[categoria]) {
+      categorias[categoria] = [];
+    }
+    categorias[categoria].push(question);
+  });
+
+  // Calcular médias para cada categoria
+  Object.entries(categorias).forEach(([categoria, perguntas]) => {
+    let sumPolitica = 0;
+    let sumPratica = 0;
+    let count = 0;
+
+    perguntas.forEach(pergunta => {
+      if (responses[pergunta.id]) {
+        sumPolitica += responses[pergunta.id].politica;
+        sumPratica += responses[pergunta.id].pratica;
+        count++;
+      }
+    });
+
+    const avgPolitica = count > 0 ? sumPolitica / count : 0;
+    const avgPratica = count > 0 ? sumPratica / count : 0;
+    const total = (avgPolitica + avgPratica) / 2;
+
+    scores[categoria] = {
+      politica: parseFloat(avgPolitica.toFixed(1)),
+      pratica: parseFloat(avgPratica.toFixed(1)),
+      total: parseFloat(total.toFixed(1))
+    };
+  });
+
+  // 2. Identificar pontos fortes e fracos
+  const pontosFracos = [];
+  const pontosFortes = [];
+  const prioridades = [];
+
+  Object.entries(scores).forEach(([categoria, score]) => {
+    if (score.total < 2.5) {
+      const nivel = 'baixo';
+      pontosFracos.push({
+        categoria,
+        score,
+        recomendacoes: recomendacoesPorCategoria[categoria]?.[nivel] || [],
+        nivel
+      });
+      prioridades.push(`Prioridade máxima: ${getCategoryName(categoria)}`);
+    } else if (score.total < 3.5) {
+      const nivel = 'medio';
+      pontosFracos.push({
+        categoria,
+        score,
+        recomendacoes: recomendacoesPorCategoria[categoria]?.[nivel] || [],
+        nivel
+      });
+      prioridades.push(`Melhorar: ${getCategoryName(categoria)}`);
+    } else {
+      pontosFortes.push({
+        categoria,
+        score,
+        nivel: 'alto'
+      });
+    }
+  });
+
+  // 3. Sugerir equipamentos baseado no nível geral
+  const nivelGeral = calcularNivelGeral(scores);
+  const equipamentos = sugerirEquipamentos(nivelGeral, pontosFracos);
+
+  // 4. Gerar resumo executivo
+  const resumo = gerarResumoExecutivo(scores, pontosFracos, pontosFortes);
+
+  return {
+    scores,
+    recomendacoes: {
+      pontosFracos,
+      pontosFortes,
+      prioridades,
+      equipamentos
+    },
+    nivelGeral,
+    resumo
+  };
+};
+
+// Funções auxiliares
+function calcularNivelGeral(scores) {
+  const valores = Object.values(scores).map(s => s.total);
+  const media = valores.reduce((a, b) => a + b, 0) / valores.length;
+  
+  if (media < 2) return 1;
+  if (media < 3) return 2;
+  if (media < 4) return 3;
+  if (media < 4.5) return 4;
+  return 5;
+}
+
+function sugerirEquipamentos(nivelGeral, pontosFracos) {
+  const equipamentosBase = {
+    1: [
+      "Firewall básico",
+      "Antivírus corporativo",
+      "Sistema de backup local"
+    ],
+    2: [
+      "Firewall de próxima geração",
+      "Sistema de detecção de intrusões (IDS)",
+      "Ferramentas de criptografia"
+    ],
+    3: [
       "Plataforma integrada de governança de dados",
-      "Ferramentas de threat intelligence integradas"
+      "Ferramentas de DLP (Data Loss Prevention)",
+      "Sistema SIEM básico"
     ],
-    investimento: "Muito Alto (acima de R$ 500.000)"
-  }
-};
+    4: [
+      "Sistema SIEM avançado",
+      "Ferramentas de análise comportamental (UEBA)",
+      "Plataforma de gestão de identidade e acesso"
+    ],
+    5: [
+      "Solução completa de governança de dados",
+      "Ferramentas de IA para proteção de dados",
+      "Sistema de orquestração de segurança"
+    ]
+  };
 
-export const getExpectativaPolitica = (nivel) => {
-  const expectativas = [
-    "A política ou o padrão NÃO existe ou NÃO é formalmente aprovada",
-    "A política existe, mas NÃO é revisada há mais de 2 anos",
-    "Política existe com aprovação formal, exceções <5%",
-    "Política formal com exceções <3% documentadas",
-    "Política formal com exceções <0,5% documentadas"
-  ];
-  return expectativas[nivel - 1] || expectativas[0];
-};
+  // Adicionar equipamentos específicos para pontos fracos
+  const extras = [];
+  pontosFracos.forEach(ponto => {
+    if (ponto.categoria === 'PR' && ponto.nivel === 'baixo') {
+      extras.push("Solução avançada de proteção de endpoints");
+    }
+    if (ponto.categoria === 'DE') {
+      extras.push("Ferramentas de monitoramento contínuo");
+    }
+  });
 
-export const getExpectativaPratica = (nivel) => {
-  const expectativas = [
-    "O processo padrão NÃO existe",
-    "Processo existe mas é executado informalmente",
-    "Processo formal documentado, exceções <10%",
-    "Processo com métricas, exceções <5%",
-    "Processo com métricas detalhadas, exceções <1%"
-  ];
-  return expectativas[nivel - 1] || expectativas[0];
-};
+  return [...equipamentosBase[nivelGeral], ...new Set(extras)];
+}
+
+function gerarResumoExecutivo(scores, pontosFracos, pontosFortes) {
+  const piorCategoria = pontosFracos.reduce((prev, current) => 
+    (prev.score.total < current.score.total) ? prev : current, pontosFracos[0]);
+  
+  const melhorCategoria = pontosFortes.reduce((prev, current) => 
+    (prev.score.total > current.score.total) ? prev : current, pontosFortes[0]);
+
+  return `Sua organização demonstra ${melhorCategoria ? `boa capacidade em ${getCategoryName(melhorCategoria.categoria)}` : 'algumas áreas bem desenvolvidas'}, 
+  porém apresenta ${piorCategoria ? `deficiências críticas em ${getCategoryName(piorCategoria.categoria)}` : 'áreas que necessitam de atenção imediata'}. 
+  Recomendamos priorizar ${piorCategoria ? piorCategoria.recomendacoes[0] : 'a criação de políticas básicas'} para alcançar conformidade plena com a LGPD.`;
+}

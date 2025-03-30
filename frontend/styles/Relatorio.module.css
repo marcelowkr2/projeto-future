@@ -1,177 +1,350 @@
-/* Container principal do relatório */
+/* Container principal */
 .relatorioContainer {
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    margin-top: 30px;
-  }
-  
-  .relatorioContainer h2 {
-    color: #1976d2;
-    text-align: center;
-    margin-bottom: 30px;
-    font-size: 1.6rem;
-    border-bottom: 2px solid #e3f2fd;
-    padding-bottom: 15px;
-  }
-  
-  /* Seção de nível */
-  .nivelSection {
-    background: #f5f9ff;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 25px;
-  }
-  
-  .nivelSection h3 {
-    margin-top: 0;
-    color: #0d47a1;
-    font-size: 1.2rem;
-  }
-  
-  .nivelInfo {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-  }
-  
-  .nivelInfo p {
-    margin: 8px 0;
-    font-size: 0.95rem;
-  }
-  
-  .nivelInfo strong {
-    color: #1565c0;
-  }
-  
-  /* Seção de recomendações */
-  .recomendacaoSection {
-    margin-bottom: 30px;
-  }
-  
-  .recomendacaoSection h3 {
-    color: #1976d2;
-    font-size: 1.3rem;
-    margin-bottom: 20px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #e3f2fd;
-  }
-  
-  .recomendacaoBox {
-    background: #f8fafc;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    border-left: 4px solid #2196f3;
-  }
-  
-  .recomendacaoBox h4 {
-    color: #1565c0;
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 1.1rem;
-  }
-  
-  .recomendacaoBox ul {
-    padding-left: 0;
-    list-style-type: none;
-  }
-  
-  .recomendacaoBox li {
-    margin-bottom: 10px;
-    padding-left: 25px;
-    position: relative;
-    line-height: 1.5;
-  }
-  
-  .recomendacaoNumber {
-    position: absolute;
-    left: 0;
-    color: #1976d2;
-    font-weight: bold;
-  }
-  
-  /* Seção de investimento */
-  .investimentoBox {
-    background: #e8f5e9;
-    padding: 20px;
-    border-radius: 8px;
-    margin-top: 30px;
-  }
-  
-  .investimentoBox h4 {
-    margin-top: 0;
-    color: #2e7d32;
-    font-size: 1.1rem;
-  }
-  
-  .investimentoBox p {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #1b5e20;
-    margin: 10px 0;
-  }
-  
-  .investimentoDetail {
-    font-size: 0.8rem;
-    color: #689f38;
-    font-style: italic;
-    margin: 5px 0 0;
-  }
-  
-  /* Seção de IA */
-  .iaSection {
-    background: #fff8e1;
-    padding: 20px;
-    border-radius: 8px;
-    border-left: 4px solid #ffc107;
-    margin-top: 30px;
-  }
-  
-  .iaContainer {
-    min-height: 60px;
-  }
-  
-  .loadingIA {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-  }
-  
-  .loadingIA .spinner {
-    border: 3px solid #fff8e1;
-    border-top: 3px solid #ffa000;
-    width: 20px;
-    height: 20px;
-  }
-  
-  .loadingIA p {
-    margin: 0;
-    color: #ff8f00;
-    font-size: 0.9rem;
-  }
-  
-  .iaContent h4 {
-    color: #ff8f00;
-    margin-top: 0;
-    margin-bottom: 10px;
-  }
-  
-  .iaContent p {
-    margin: 0;
-    line-height: 1.6;
-  }
-  
-  .iaTips {
-    background: rgba(255, 167, 38, 0.1);
-    padding: 10px;
-    border-radius: 5px;
-    margin-top: 15px;
-    font-size: 0.9rem;
-  }
-  
-  .iaTips p {
-    margin: 0;
-    color: #e65100;
-  }
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Cabeçalho */
+.cabecalho {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.cabecalho h2 {
+  color: #1976d2;
+  margin-bottom: 10px;
+  font-size: 28px;
+}
+
+.nivelGeral {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.nivelGeral span {
+  font-weight: 600;
+  color: #0d47a1;
+}
+
+/* Resumo executivo */
+.resumoExecutivo {
+  background: #f5f9ff;
+  padding: 25px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  border-left: 4px solid #1976d2;
+}
+
+.resumoExecutivo h3 {
+  margin-top: 0;
+  color: #1565c0;
+  font-size: 20px;
+}
+
+.resumoExecutivo p {
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* Quadro de scores */
+.quadroScores {
+  margin-bottom: 40px;
+}
+
+.quadroScores h3 {
+  color: #2c3e50;
+  font-size: 22px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.scoresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.scoreItem {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.scoreItem h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #1976d2;
+  font-size: 18px;
+}
+
+.scoreBar {
+  height: 20px;
+  background: #f5f5f5;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.scoreFill {
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #64b5f6, #1976d2);
+  transition: width 0.5s ease;
+}
+
+.scoreBar span {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.scoreDetails {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #666;
+}
+
+/* Áreas de melhoria */
+.areaMelhoria {
+  margin-bottom: 40px;
+}
+
+.areaMelhoria h3 {
+  color: #d32f2f;
+  font-size: 22px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ffcdd2;
+}
+
+.melhoriaItem {
+  background: #fff5f5;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 4px solid #e53935;
+}
+
+.melhoriaHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.melhoriaHeader h4 {
+  margin: 0;
+  color: #c62828;
+  font-size: 18px;
+}
+
+.nivelTag {
+  background: #e53935;
+  color: white;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.scoreContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.scoreMeter {
+  flex-grow: 1;
+  height: 10px;
+  background: #ffcdd2;
+  border-radius: 5px;
+  margin-right: 10px;
+  overflow: hidden;
+}
+
+.meterFill {
+  height: 100%;
+  background: linear-gradient(90deg, #ef5350, #c62828);
+  transition: width 0.5s ease;
+}
+
+.scoreValue {
+  font-weight: bold;
+  color: #c62828;
+  min-width: 30px;
+  text-align: right;
+}
+
+.recomendacoesList {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.recomendacoesList li {
+  padding: 8px 0;
+  border-bottom: 1px dashed #ffccbc;
+  display: flex;
+  align-items: center;
+}
+
+.recomendacoesList li:last-child {
+  border-bottom: none;
+}
+
+.recomendacoesList input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.recomendacoesList label {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.recomendacoesList label:hover {
+  color: #d32f2f;
+}
+
+/* Áreas fortes */
+.areaForte {
+  margin-bottom: 40px;
+}
+
+.areaForte h3 {
+  color: #2e7d32;
+  font-size: 22px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #c8e6c9;
+}
+
+.pontosFortesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.forteItem {
+  background: #f1f8e9;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #43a047;
+  text-align: center;
+}
+
+.forteItem h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #2e7d32;
+  font-size: 18px;
+}
+
+.forteScore {
+  font-size: 32px;
+  font-weight: bold;
+  color: #1b5e20;
+  margin: 10px 0;
+}
+
+.forteDescricao {
+  font-size: 14px;
+  color: #33691e;
+  margin-bottom: 0;
+}
+
+/* Plano de ação */
+.planoAcao {
+  background: #e3f2fd;
+  padding: 30px;
+  border-radius: 8px;
+}
+
+.planoAcao h3 {
+  margin-top: 0;
+  color: #0d47a1;
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+.prioridadesList {
+  list-style: none;
+  padding-left: 0;
+  margin: 0 0 30px;
+}
+
+.prioridadesList li {
+  padding: 12px 0;
+  border-bottom: 1px solid #bbdefb;
+  display: flex;
+  align-items: center;
+}
+
+.prioridadesList li:last-child {
+  border-bottom: none;
+}
+
+.prioridadeIndex {
+  background: #1976d2;
+  color: white;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.prioridadeText {
+  font-weight: 500;
+}
+
+.planoAcao h4 {
+  color: #1565c0;
+  font-size: 18px;
+  margin: 25px 0 15px;
+}
+
+.equipamentosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.equipamentoItem {
+  background: white;
+  padding: 12px 15px;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+}
+
+.equipamentoCheckbox {
+  margin-right: 12px;
+}
+
+.equipamentoLabel {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.equipamentoLabel:hover {
+  color: #0d47a1;
+}

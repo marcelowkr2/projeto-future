@@ -3153,3 +3153,5 @@ WARNING 2025-03-26 22:02:29,544 log Forbidden (CSRF cookie not set.): /assessmen
 WARNING 2025-03-27 07:16:38,757 log Forbidden (CSRF cookie not set.): /assessments/submit/
 WARNING 2025-03-27 08:48:59,357 signals Permissões do usuário Administrador foram alteradas.
 WARNING 2025-03-27 08:48:59,360 signals Permissões do usuário Analista de Segurança foram alteradas.
+WARNING 2025-03-28 20:34:08,953 signals Permissões do usuário oliveira foram alteradas.
+WARNING 2025-03-28 20:48:45,536 signals Permissões do usuário marcelowkr foram alteradas.

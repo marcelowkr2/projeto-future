@@ -12,9 +12,9 @@ import {
   Legend 
 } from 'chart.js';
 import RelatorioRecomendacoes from '../components/RelatorioRecomendacoes';
+import { getRecomendacoesPersonalizadas } from '../services/recomendacoes';
 import styles from '../styles/Assessment.module.css';
 
-// Registro do ChartJS
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
 const Assessment = () => {
@@ -30,56 +30,38 @@ const Assessment = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [unansweredQuestions, setUnansweredQuestions] = useState([]);
 
-  // Função para traduzir códigos de categoria
-  const getCategoryName = (code) => {
-    const names = {
-      "GV": "Governança",
-      "ID": "Identificar",
-      "PR": "Proteger",
-      "DE": "Detectar",
-      "RS": "Responder",
-      "RC": "Recuperar"
-    };
-    return names[code] || code;
-  };
-
-  // Carrega as questões da API
+  // Carregar questões da API
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         setLoading(true);
-        setError(null);
-        
         const token = getAuthToken();
+        
         if (!token) {
-          throw new Error('Token de autenticação não encontrado');
+          throw new Error('Autenticação necessária');
         }
 
         const response = await API.get('/assessments/questions/', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          headers: { Authorization: `Bearer ${token}` }
         });
 
-        if (!response.data || !Array.isArray(response.data)) {
-          throw new Error('Formato de dados inválido da API');
+        if (!response.data) {
+          throw new Error('Dados inválidos da API');
         }
 
         setQuestions(response.data);
         
-        // Extrai e define as categorias únicas
         const uniqueCategories = [...new Set(
           response.data.map(q => q.category.split('.')[0])
         )];
         setCategories(uniqueCategories);
         
-        // Define a primeira categoria como ativa
         if (uniqueCategories.length > 0) {
           setActiveCategory(uniqueCategories[0]);
         }
       } catch (err) {
         console.error('Erro ao carregar questões:', err);
-        setError(err.message || 'Erro ao carregar as questões. Tente recarregar a página.');
+        setError(err.message || 'Erro ao carregar avaliação');
       } finally {
         setLoading(false);
       }
@@ -88,7 +70,7 @@ const Assessment = () => {
     fetchQuestions();
   }, []);
 
-  // Calcula o progresso das respostas
+  // Calcular progresso
   useEffect(() => {
     if (questions.length > 0) {
       const answered = Object.keys(responses).filter(
@@ -98,7 +80,7 @@ const Assessment = () => {
     }
   }, [responses, questions]);
 
-  // Manipula mudanças nas respostas
+  // Manipular mudanças nas respostas
   const handleResponseChange = (questionId, type, value) => {
     setResponses(prev => ({
       ...prev,
@@ -109,12 +91,11 @@ const Assessment = () => {
     }));
   };
 
-  // Valida e envia as respostas
+  // Validar e enviar respostas
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
       
-      // Encontra perguntas não respondidas
       const unanswered = questions.filter(q => {
         const response = responses[q.id];
         return !response?.politica || !response?.pratica;
@@ -124,19 +105,13 @@ const Assessment = () => {
         setUnansweredQuestions(unanswered);
         window.scrollTo(0, 0);
         
-        // Cria mensagem detalhada
-        let alertMessage = `Por favor, responda todas as perguntas antes de enviar.\n\nFaltam ${unanswered.length} perguntas:\n\n`;
-        
+        let alertMessage = `Faltam responder ${unanswered.length} pergunta(s):\n\n`;
         unanswered.forEach((q, index) => {
-          const categoryName = getCategoryName(q.category.split('.')[0]);
-          alertMessage += `${index + 1}. [${categoryName}] ${q.text}\n`;
+          const missing = [];
+          if (!responses[q.id]?.politica) missing.push('Política');
+          if (!responses[q.id]?.pratica) missing.push('Prática');
           
-          // Adiciona quais campos estão faltando
-          const missingFields = [];
-          if (!responses[q.id]?.politica) missingFields.push('Política');
-          if (!responses[q.id]?.pratica) missingFields.push('Prática');
-          
-          alertMessage += `   (Faltando: ${missingFields.join(' e ')})\n\n`;
+          alertMessage += `${index + 1}. ${q.text}\n(Faltando: ${missing.join(' e ')})\n\n`;
         });
 
         alert(alertMessage);
@@ -153,37 +128,27 @@ const Assessment = () => {
         ...values
       }));
   
-      const response = await API.post('/assessments/submit/', formattedResponses, {
+      await API.post('/assessments/submit/', formattedResponses, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'X-CSRFToken': csrfToken 
         }
       });
-      
-      if (response.status === 200) {
-        alert('Respostas enviadas com sucesso!');
-      }
+
+      alert('Respostas salvas com sucesso!');
     } catch (err) {
       console.error('Erro ao enviar respostas:', err);
-      alert('Erro ao enviar respostas. Por favor, tente novamente.');
+      alert('Erro ao salvar respostas. Tente novamente.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Gera o relatório de conformidade
-  const generateReport = async () => {
+  // Gerar relatório
+  const generateReport = () => {
     try {
-      const token = getAuthToken();
-      const response = await API.get('/assessments/reports/lgpd_score/', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      if (!response.data) {
-        throw new Error('Dados do relatório não recebidos');
-      }
-      
-      setReport(response.data);
+      const reportData = getRecomendacoesPersonalizadas(responses, questions);
+      setReport(reportData);
       setShowReport(true);
     } catch (err) {
       console.error('Erro ao gerar relatório:', err);
@@ -347,12 +312,11 @@ const Assessment = () => {
       }
     }
   };
-
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.spinner}></div>
-        <p>Carregando questões...</p>
+        <p>Carregando avaliação...</p>
       </div>
     );
   }
@@ -360,7 +324,7 @@ const Assessment = () => {
   if (error) {
     return (
       <div className={styles.errorContainer}>
-        <h3>Erro ao carregar a avaliação</h3>
+        <h3>Erro ao carregar avaliação</h3>
         <p>{error}</p>
         <button 
           onClick={() => window.location.reload()}
@@ -374,7 +338,6 @@ const Assessment = () => {
 
   return (
     <>
-      {/* Barra de progresso fixa no topo */}
       <div className={styles.progressContainerFixed}>
         <div 
           className={styles.progressBarFixed} 
@@ -387,35 +350,30 @@ const Assessment = () => {
         </span>
       </div>
 
-      {/* Container principal */}
       <div className={styles.container}>
-        {/* Alerta de perguntas não respondidas */}
         {unansweredQuestions.length > 0 && (
           <div className={styles.unansweredAlert}>
-            <h3>Perguntas não respondidas:</h3>
+            <h3>Perguntas pendentes</h3>
             <ul>
-              {unansweredQuestions.map((q, index) => {
-                const missingFields = [];
-                if (!responses[q.id]?.politica) missingFields.push('Política');
-                if (!responses[q.id]?.pratica) missingFields.push('Prática');
-                
-                return (
-                  <li key={index}>
-                    <strong>{q.text}</strong>
-                    <span> (Faltando: {missingFields.join(' e ')})</span>
-                    <button 
-                      onClick={() => {
-                        document.getElementById(`question-${q.id}`)?.scrollIntoView({
-                          behavior: 'smooth'
-                        });
-                      }}
-                      className={styles.jumpToButton}
-                    >
-                      Ir para pergunta
-                    </button>
-                  </li>
-                );
-              })}
+              {unansweredQuestions.map((q, index) => (
+                <li key={index}>
+                  <strong>{q.text}</strong>
+                  <div className={styles.missingFields}>
+                    {!responses[q.id]?.politica && <span>Política</span>}
+                    {!responses[q.id]?.pratica && <span>Prática</span>}
+                  </div>
+                  <button 
+                    onClick={() => {
+                      document.getElementById(`question-${q.id}`)?.scrollIntoView({
+                        behavior: 'smooth'
+                      });
+                    }}
+                    className={styles.jumpToButton}
+                  >
+                    Ir para pergunta
+                  </button>
+                </li>
+              ))}
             </ul>
             <button 
               onClick={() => setUnansweredQuestions([])}
@@ -426,10 +384,10 @@ const Assessment = () => {
           </div>
         )}
 
-        <h1 className={styles.title}>Avaliação de Maturidade em LGPD</h1>
-        
         {!showReport ? (
           <>
+            <h1 className={styles.title}>Avaliação de Maturidade LGPD</h1>
+            
             <div className={styles.categoryMenu}>
               {categories.map(category => (
                 <button
@@ -450,8 +408,8 @@ const Assessment = () => {
                 .map(question => (
                   <div 
                     key={question.id} 
-                    className={styles.questionCard}
                     id={`question-${question.id}`}
+                    className={styles.questionCard}
                   >
                     <h3 className={styles.questionText}>{question.text}</h3>
                     <p className={styles.questionCategory}>
@@ -469,12 +427,12 @@ const Assessment = () => {
                         )}
                         className={styles.responseSelect}
                       >
-                        <option value="">Selecione o nível</option>
-                        <option value="1">1 - Inicial</option>
-                        <option value="2">2 - Repetido</option>
-                        <option value="3">3 - Definido</option>
-                        <option value="4">4 - Gerenciado</option>
-                        <option value="5">5 - Otimizado</option>
+                        <option value="">Selecione...</option>
+                        {[1, 2, 3, 4, 5].map(opt => (
+                          <option key={`pol-${opt}`} value={opt}>
+                            {opt} - {getNivelDescricao(opt)}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     
@@ -489,12 +447,12 @@ const Assessment = () => {
                         )}
                         className={styles.responseSelect}
                       >
-                        <option value="">Selecione o nível</option>
-                        <option value="1">1 - Inicial</option>
-                        <option value="2">2 - Repetido</option>
-                        <option value="3">3 - Definido</option>
-                        <option value="4">4 - Gerenciado</option>
-                        <option value="5">5 - Otimizado</option>
+                        <option value="">Selecione...</option>
+                        {[1, 2, 3, 4, 5].map(opt => (
+                          <option key={`prat-${opt}`} value={opt}>
+                            {opt} - {getNivelDescricao(opt)}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
@@ -507,44 +465,63 @@ const Assessment = () => {
                 className={styles.submitButton}
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Enviando...' : 'Salvar Respostas'}
+                {isSubmitting ? 'Salvando...' : 'Salvar Respostas'}
               </button>
               
               <button 
                 onClick={generateReport}
                 className={styles.reportButton}
                 disabled={progress < 100}
-                title={progress < 100 ? 'Responda todas as perguntas para gerar o relatório' : ''}
               >
-                Gerar Relatório LGPD
+                Gerar Relatório Completo
               </button>
             </div>
           </>
         ) : (
           <div className={styles.reportContainer}>
-            <h2 className={styles.reportTitle}>
-              Relatório de Conformidade com a LGPD
-            </h2>
+            <button 
+              onClick={() => setShowReport(false)}
+              className={styles.backButton}
+            >
+              Voltar para avaliação
+            </button>
             
             <div className={styles.scoreSummary}>
-              <div style={{ height: '500px', width: '100%', maxWidth: '800px', margin: '0 auto' }}>
+              <div style={{ height: '500px', marginBottom: '40px' }}>
                 <Radar data={radarData} options={radarOptions} />
               </div>
               
-              <RelatorioRecomendacoes scores={report.scores} />
+              <RelatorioRecomendacoes report={report} />
             </div>
-            
-            <button 
-              onClick={() => setShowReport(false)} 
-              className={styles.backButton}
-            >
-              Voltar para a avaliação
-            </button>
           </div>
         )}
       </div>
     </>
   );
 };
+
+// Função auxiliar para descrição dos níveis
+function getNivelDescricao(nivel) {
+  const descricoes = {
+    1: "Inicial",
+    2: "Repetido",
+    3: "Definido",
+    4: "Gerenciado",
+    5: "Otimizado"
+  };
+  return descricoes[nivel] || "";
+}
+
+function getCategoryName(code) {
+  const names = {
+    "GV": "Governança",
+    "ID": "Identificar",
+    "PR": "Proteger",
+    "DE": "Detectar",
+    "RS": "Responder",
+    "RC": "Recuperar"
+  };
+  return names[code] || code;
+}
 
 export default Assessment;
