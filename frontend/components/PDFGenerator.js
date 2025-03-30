@@ -1,10 +1,11 @@
 import { Page, Text, View, Document, StyleSheet, Image } from '@react-pdf/renderer';
+import { getCategoryName } from '../services/recomendacoes';
 
 const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
     backgroundColor: '#FFFFFF',
-    padding: 30
+    padding: 40
   },
   header: {
     marginBottom: 20,
@@ -12,14 +13,14 @@ const styles = StyleSheet.create({
     borderBottom: '1px solid #1976d2'
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#1976d2',
     marginBottom: 5
   },
   subtitle: {
-    fontSize: 14,
-    color: '#666666'
+    fontSize: 12,
+    color: '#666'
   },
   section: {
     marginBottom: 15,
@@ -32,77 +33,62 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     color: '#333333'
   },
-  questionBlock: {
-    marginBottom: 10,
-    padding: 10,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 5
-  },
-  questionText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    marginBottom: 5
-  },
-  answerText: {
-    fontSize: 11,
-    marginLeft: 10
-  },
   chartContainer: {
     marginVertical: 15,
     alignItems: 'center'
   },
-  chartTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    textAlign: 'center'
-  },
-  footer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 30,
-    right: 30,
-    fontSize: 10,
-    textAlign: 'center',
-    color: '#999999'
+  chartImage: {
+    width: '300px',
+    height: '300px'
   },
   table: { 
-    display: "table", 
-    width: "auto", 
-    marginBottom: 15
+    width: '100%',
+    marginBottom: 15,
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#dddddd'
   },
   tableRow: { 
-    flexDirection: "row" 
+    flexDirection: 'row' 
   },
   tableColHeader: {
-    width: "50%",
-    borderBottomWidth: 1,
-    borderBottomColor: '#1976d2',
-    borderBottomStyle: 'solid',
-    padding: 5,
-    backgroundColor: '#e3f2fd'
+    width: '100%',
+    padding: 8,
+    backgroundColor: '#f5f5f5',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#dddddd'
   },
   tableCol: {
-    width: "50%",
-    borderBottomWidth: 1,
-    borderBottomColor: '#eeeeee',
-    borderBottomStyle: 'solid',
-    padding: 5
+    width: '100%',
+    padding: 8,
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#dddddd'
   },
-  tableCell: { 
-    fontSize: 11,
-    textAlign: 'center'
+  tableCell: {
+    fontSize: 10,
+    textAlign: 'left'
+  },
+  recommendationItem: {
+    marginBottom: 5,
+    fontSize: 10,
+    lineHeight: 1.4
+  },
+  nivelGeral: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#1976d2'
   }
 });
 
-const PDFGenerator = ({ questions, responses, radarImage, nivelGeral, scores }) => {
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('pt-BR', {
+const PDFGenerator = ({ report, radarImage }) => {
+  const formatDate = () => {
+    return new Date().toLocaleDateString('pt-BR', {
       day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      month: 'long',
+      year: 'numeric'
     });
   };
 
@@ -119,101 +105,93 @@ const PDFGenerator = ({ questions, responses, radarImage, nivelGeral, scores }) 
 
   return (
     <Document>
-      {/* Página de capa */}
-      <Page size="A4" style={[styles.page, { justifyContent: 'center', alignItems: 'center' }]}>
-        <View style={{ textAlign: 'center' }}>
-          <Text style={[styles.title, { fontSize: 28, marginBottom: 20 }]}>Relatório de Maturidade LGPD</Text>
-          <Text style={[styles.subtitle, { fontSize: 16, marginBottom: 5 }]}>
-            Nível Geral: {nivelGeral} - {getNivelDescricao(nivelGeral)}
-          </Text>
-          <Text style={styles.subtitle}>Gerado em: {formatDate(new Date())}</Text>
-        </View>
-      </Page>
-
-      {/* Página de conteúdo principal */}
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
-          <Text style={styles.title}>Análise Detalhada</Text>
+          <Text style={styles.title}>Relatório de Maturidade LGPD</Text>
+          <Text style={styles.subtitle}>Gerado em: {formatDate()}</Text>
+          <Text style={styles.nivelGeral}>
+            Nível Geral: {report.nivelGeral} - {getNivelDescricao(report.nivelGeral)}
+          </Text>
         </View>
 
-        {/* Gráfico Radar */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Desempenho por Categoria</Text>
-          <View style={styles.chartContainer}>
-            {radarImage && (
-              <Image 
-                src={radarImage} 
-                style={{ width: '300px', height: '300px' }} 
-              />
-            )}
+          <Text style={styles.sectionTitle}>Resumo Executivo</Text>
+          <Text style={styles.recommendationItem}>{report.resumo}</Text>
+        </View>
+
+        {radarImage && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Desempenho por Dimensão</Text>
+            <View style={styles.chartContainer}>
+              <Image src={radarImage} style={styles.chartImage} />
+            </View>
           </View>
-        </View>
+        )}
 
-        {/* Tabela de Scores */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Pontuação por Dimensão</Text>
+          <Text style={styles.sectionTitle}>Pontuação por Categoria</Text>
           <View style={styles.table}>
             <View style={styles.tableRow}>
               <View style={styles.tableColHeader}>
-                <Text style={styles.tableCell}>Categoria</Text>
+                <Text style={[styles.tableCell, { fontWeight: 'bold' }]}>Categoria</Text>
               </View>
               <View style={styles.tableColHeader}>
-                <Text style={styles.tableCell}>Pontuação</Text>
+                <Text style={[styles.tableCell, { fontWeight: 'bold' }]}>Pontuação</Text>
               </View>
             </View>
-            {Object.entries(scores).map(([categoria, score]) => (
-              <View style={styles.tableRow} key={categoria}>
+            {Object.entries(report.scores).map(([categoria, score]) => (
+              <View key={categoria} style={styles.tableRow}>
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>{getCategoryName(categoria)}</Text>
                 </View>
                 <View style={styles.tableCol}>
-                  <Text style={styles.tableCell}>{score.total.toFixed(1)}</Text>
+                  <Text style={styles.tableCell}>
+                    Total: {score.total.toFixed(1)} | Política: {score.politica} | Prática: {score.pratica}
+                  </Text>
                 </View>
               </View>
             ))}
           </View>
         </View>
 
-        {/* Respostas Detalhadas */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Respostas Completas</Text>
-          {questions.map((question, index) => (
-            <View key={question.id} style={styles.questionBlock} break={index % 15 === 0 && index !== 0}>
-              <Text style={styles.questionText}>
-                {index + 1}. {question.text} [{question.category}]
+          <Text style={styles.sectionTitle}>Recomendações Prioritárias</Text>
+          {report.recomendacoes.pontosFracos.map((item, index) => (
+            <View key={index} style={{ marginBottom: 10 }}>
+              <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 5 }}>
+                {getCategoryName(item.categoria)} (Pontuação: {item.score.total.toFixed(1)})
               </Text>
-              {responses[question.id] && (
-                <>
-                  <Text style={styles.answerText}>
-                    Política: {responses[question.id].politica} - {getNivelDescricao(responses[question.id].politica)}
-                  </Text>
-                  <Text style={styles.answerText}>
-                    Prática: {responses[question.id].pratica} - {getNivelDescricao(responses[question.id].pratica)}
-                  </Text>
-                </>
-              )}
+              {item.recomendacoes.map((rec, i) => (
+                <Text key={i} style={styles.recommendationItem}>• {rec}</Text>
+              ))}
             </View>
           ))}
         </View>
 
-        <View style={styles.footer}>
-          <Text>Relatório gerado automaticamente - Sistema de Avaliação LGPD</Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Plano de Ação</Text>
+          <View style={{ marginLeft: 10 }}>
+            {report.recomendacoes.prioridades.map((item, index) => (
+              <Text key={index} style={styles.recommendationItem}>
+                {index + 1}. {item}
+              </Text>
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Investimentos Recomendados</Text>
+          <View style={{ marginLeft: 10 }}>
+            {report.recomendacoes.equipamentos.map((item, index) => (
+              <Text key={index} style={styles.recommendationItem}>
+                • {item}
+              </Text>
+            ))}
+          </View>
         </View>
       </Page>
     </Document>
   );
-};
-
-const getCategoryName = (code) => {
-  const names = {
-    "GV": "Governança",
-    "ID": "Identificar",
-    "PR": "Proteger",
-    "DE": "Detectar",
-    "RS": "Responder",
-    "RC": "Recuperar"
-  };
-  return names[code] || code;
 };
 
 export default PDFGenerator;

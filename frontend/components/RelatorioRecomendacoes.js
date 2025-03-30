@@ -1,9 +1,109 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { Radar } from 'react-chartjs-2';
 import { getCategoryName } from '../services/recomendacoes';
 import styles from '../styles/Relatorio.module.css';
 
 const RelatorioRecomendacoes = ({ report }) => {
   const { scores, recomendacoes, nivelGeral, resumo } = report;
+
+  const radarData = {
+    labels: Object.keys(scores).map(cat => `${getCategoryName(cat)} (${cat})`),
+    datasets: [
+      {
+        label: 'Política',
+        data: Object.values(scores).map(s => s.politica),
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 2,
+        pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+        pointBorderColor: '#fff',
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(54, 162, 235, 1)',
+      },
+      {
+        label: 'Prática',
+        data: Object.values(scores).map(s => s.pratica),
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 2,
+        pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+        pointBorderColor: '#fff',
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(75, 192, 192, 1)',
+      }
+    ]
+  };
+
+  const radarOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      r: {
+        angleLines: {
+          display: true,
+          color: 'rgba(200, 200, 200, 0.3)',
+          lineWidth: 1
+        },
+        suggestedMin: 0,
+        suggestedMax: 5,
+        ticks: {
+          stepSize: 1,
+          backdropColor: 'transparent',
+          color: '#555',
+          font: {
+            size: 12,
+            weight: 'bold'
+          },
+          callback: function(value) {
+            const levelDescriptions = {
+              1: 'Inicial',
+              2: 'Repetido',
+              3: 'Definido',
+              4: 'Gerenciado',
+              5: 'Otimizado'
+            };
+            return `${value} - ${levelDescriptions[value] || ''}`;
+          }
+        },
+        grid: {
+          circular: true,
+          color: 'rgba(200, 200, 200, 0.5)',
+          lineWidth: 1
+        },
+        pointLabels: {
+          font: {
+            size: 13,
+            weight: 'bold'
+          },
+          color: '#333',
+          padding: 15
+        },
+        startAngle: 0
+      }
+    },
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: {
+          color: '#333',
+          font: {
+            size: 14,
+            weight: 'bold'
+          },
+          padding: 20,
+          usePointStyle: true,
+          pointStyle: 'circle'
+        }
+      }
+    },
+    elements: {
+      line: {
+        tension: 0.1
+      }
+    }
+  };
 
   return (
     <div className={styles.relatorioContainer}>
@@ -120,7 +220,6 @@ const RelatorioRecomendacoes = ({ report }) => {
   );
 };
 
-// Funções auxiliares do componente
 function getNivelDescricao(nivel) {
   const descricoes = {
     1: "Inicial - Processos não existentes ou ad hoc",

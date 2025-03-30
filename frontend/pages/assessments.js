@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import API from '../services/api';
 import { getAuthToken } from '../utils/auth';
 import { Radar } from 'react-chartjs-2';
@@ -11,7 +11,10 @@ import {
   Tooltip, 
   Legend 
 } from 'chart.js';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import html2canvas from 'html2canvas';
 import RelatorioRecomendacoes from '../components/RelatorioRecomendacoes';
+import PDFGenerator from '../components/PDFGenerator';
 import { getRecomendacoesPersonalizadas } from '../services/recomendacoes';
 import styles from '../styles/Assessment.module.css';
 
@@ -29,8 +32,9 @@ const Assessment = () => {
   const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [unansweredQuestions, setUnansweredQuestions] = useState([]);
+  const [radarImage, setRadarImage] = useState(null);
+  const radarChartRef = useRef();
 
-  // Carregar questões da API
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
@@ -70,7 +74,6 @@ const Assessment = () => {
     fetchQuestions();
   }, []);
 
-  // Calcular progresso
   useEffect(() => {
     if (questions.length > 0) {
       const answered = Object.keys(responses).filter(
@@ -80,7 +83,6 @@ const Assessment = () => {
     }
   }, [responses, questions]);
 
-  // Manipular mudanças nas respostas
   const handleResponseChange = (questionId, type, value) => {
     setResponses(prev => ({
       ...prev,
@@ -89,9 +91,9 @@ const Assessment = () => {
         [type]: parseInt(value, 10)
       }
     }));
+    setUnansweredQuestions(prev => prev.filter(q => q.id !== questionId));
   };
 
-  // Validar e enviar respostas
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
@@ -111,7 +113,7 @@ const Assessment = () => {
           if (!responses[q.id]?.politica) missing.push('Política');
           if (!responses[q.id]?.pratica) missing.push('Prática');
           
-          alertMessage += `${index + 1}. ${q.text}\n(Faltando: ${missing.join(' e ')})\n\n`;
+          alertMessage += `${index + 1}. ${q.text} [${getCategoryName(q.category.split('.')[0])}]\n(Faltando: ${missing.join(' e ')})\n\n`;
         });
 
         alert(alertMessage);
@@ -144,19 +146,44 @@ const Assessment = () => {
     }
   };
 
-  // Gerar relatório
-  const generateReport = () => {
+  const generateReport = async () => {
     try {
+      const unanswered = questions.filter(q => {
+        const response = responses[q.id];
+        return !response?.politica || !response?.pratica;
+      });
+
+      if (unanswered.length > 0) {
+        setUnansweredQuestions(unanswered);
+        window.scrollTo(0, 0);
+        alert(`Existem ${unanswered.length} pergunta(s) não respondidas.`);
+        return;
+      }
+
       const reportData = getRecomendacoesPersonalizadas(responses, questions);
       setReport(reportData);
       setShowReport(true);
+
+      // Captura do gráfico após o relatório ser renderizado
+      setTimeout(async () => {
+        try {
+          const canvas = await html2canvas(radarChartRef.current, {
+            scale: 2,
+            logging: false,
+            useCORS: true
+          });
+          setRadarImage(canvas.toDataURL('image/png'));
+        } catch (err) {
+          console.error('Erro ao capturar gráfico:', err);
+        }
+      }, 500);
+      
     } catch (err) {
       console.error('Erro ao gerar relatório:', err);
-      alert('Erro ao gerar relatório. Verifique se todas as perguntas foram respondidas.');
+      alert('Erro ao gerar relatório. Verifique o console para mais detalhes.');
     }
   };
 
-  // Configuração do gráfico radar
   const radarData = {
     labels: categories.map(cat => {
       const nistMapping = {
@@ -170,18 +197,6 @@ const Assessment = () => {
       return nistMapping[cat] || cat;
     }),
     datasets: [
-      {
-        label: 'Objetivos',
-        data: categories.map(cat => report?.scores[cat]?.objetivos || 0),
-        backgroundColor: 'rgba(255, 159, 64, 0.2)',
-        borderColor: 'rgba(255, 159, 64, 1)',
-        borderWidth: 2,
-        pointBackgroundColor: 'rgba(255, 159, 64, 1)',
-        pointBorderColor: '#fff',
-        pointHoverRadius: 5,
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(255, 159, 64, 1)',
-      },
       {
         label: 'Política',
         data: categories.map(cat => report?.scores[cat]?.politica || 0),
@@ -205,14 +220,13 @@ const Assessment = () => {
         pointHoverRadius: 5,
         pointHoverBackgroundColor: '#fff',
         pointHoverBorderColor: 'rgba(75, 192, 192, 1)',
-      },
+      }
     ],
   };
 
   const radarOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    aspectRatio: 1,
     scales: {
       r: {
         angleLines: {
@@ -270,40 +284,6 @@ const Assessment = () => {
           usePointStyle: true,
           pointStyle: 'circle'
         }
-      },
-      tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleFont: {
-          size: 16,
-          weight: 'bold'
-        },
-        bodyFont: {
-          size: 14
-        },
-        callbacks: {
-          label: function(context) {
-            const levelDescriptions = {
-              1: 'Inicial',
-              2: 'Repetido',
-              3: 'Definido',
-              4: 'Gerenciado',
-              5: 'Otimizado'
-            };
-            return `${context.dataset.label}: ${context.raw} (${levelDescriptions[context.raw] || ''})`;
-          },
-          afterLabel: function(context) {
-            const nistExplanations = {
-              "GV": "Governança - Estabelecimento de políticas e procedimentos",
-              "ID": "Identificar - Compreensão dos riscos à privacidade",
-              "PR": "Proteger - Implementação de salvaguardas",
-              "DE": "Detectar - Identificação de eventos de segurança",
-              "RS": "Responder - Ações para incidentes de privacidade",
-              "RC": "Recuperar - Restauração após violações"
-            };
-            const category = context.label.replace(/\(([^)]+)\)/, '$1').trim();
-            return `\n${nistExplanations[category] || ''}`;
-          }
-        }
       }
     },
     elements: {
@@ -312,6 +292,7 @@ const Assessment = () => {
       }
     }
   };
+
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
@@ -357,7 +338,7 @@ const Assessment = () => {
             <ul>
               {unansweredQuestions.map((q, index) => (
                 <li key={index}>
-                  <strong>{q.text}</strong>
+                  <strong>{q.text} [{getCategoryName(q.category.split('.')[0])}]</strong>
                   <div className={styles.missingFields}>
                     {!responses[q.id]?.politica && <span>Política</span>}
                     {!responses[q.id]?.pratica && <span>Prática</span>}
@@ -413,7 +394,7 @@ const Assessment = () => {
                   >
                     <h3 className={styles.questionText}>{question.text}</h3>
                     <p className={styles.questionCategory}>
-                      {question.category}
+                      Categoria: {getCategoryName(question.category.split('.')[0])} ({question.category})
                     </p>
                     
                     <div className={styles.responseSection}>
@@ -486,13 +467,25 @@ const Assessment = () => {
               Voltar para avaliação
             </button>
             
-            <div className={styles.scoreSummary}>
-              <div style={{ height: '500px', marginBottom: '40px' }}>
-                <Radar data={radarData} options={radarOptions} />
-              </div>
-              
-              <RelatorioRecomendacoes report={report} />
+            <div ref={radarChartRef} style={{ height: '500px', marginBottom: '40px' }}>
+              <Radar data={radarData} options={radarOptions} />
             </div>
+            
+            <RelatorioRecomendacoes report={report} />
+
+            {radarImage && (
+              <PDFDownloadLink
+                document={<PDFGenerator report={report} radarImage={radarImage} />}
+                fileName={`relatorio_lgpd_${new Date().toISOString().slice(0,10)}.pdf`}
+                className={styles.pdfLink}
+              >
+                {({ loading }) => (
+                  <button className={styles.pdfButton}>
+                    {loading ? 'Preparando PDF...' : 'Baixar Relatório PDF'}
+                  </button>
+                )}
+              </PDFDownloadLink>
+            )}
           </div>
         )}
       </div>
@@ -500,7 +493,6 @@ const Assessment = () => {
   );
 };
 
-// Função auxiliar para descrição dos níveis
 function getNivelDescricao(nivel) {
   const descricoes = {
     1: "Inicial",

@@ -1,4 +1,3 @@
-// Mapeamento de nomes de categorias
 const categoryNames = {
   "GV": "Governança",
   "ID": "Identificar",
@@ -10,7 +9,6 @@ const categoryNames = {
 
 export const getCategoryName = (code) => categoryNames[code] || code;
 
-// Recomendações baseadas em critérios específicos
 const recomendacoesPorCategoria = {
   GV: {
     baixo: [
@@ -46,16 +44,80 @@ const recomendacoesPorCategoria = {
       "Implementar análise contínua de riscos à privacidade"
     ]
   },
-  // [...] (adicionar outras categorias seguindo o mesmo padrão)
+  PR: {
+    baixo: [
+      "Implementar controles básicos de acesso",
+      "Criar política de senhas fortes",
+      "Estabelecer procedimentos de criptografia"
+    ],
+    medio: [
+      "Implementar autenticação multifator",
+      "Atualizar políticas de controle de acesso",
+      "Realizar auditorias regulares de segurança"
+    ],
+    alto: [
+      "Implementar controle de acesso baseado em atributos",
+      "Automatizar rotinas de proteção de dados",
+      "Implementar soluções avançadas de criptografia"
+    ]
+  },
+  DE: {
+    baixo: [
+      "Implementar monitoramento básico de sistemas",
+      "Estabelecer procedimentos para detecção de incidentes",
+      "Criar inventário de ativos de dados"
+    ],
+    medio: [
+      "Implementar ferramentas de monitoramento contínuo",
+      "Automatizar detecção de anomalias",
+      "Estabelecer métricas de monitoramento"
+    ],
+    alto: [
+      "Implementar sistema SIEM completo",
+      "Integrar detecção com resposta a incidentes",
+      "Utilizar inteligência artificial para detecção"
+    ]
+  },
+  RS: {
+    baixo: [
+      "Criar plano básico de resposta a incidentes",
+      "Designar equipe de resposta",
+      "Estabelecer comunicação com autoridades"
+    ],
+    medio: [
+      "Realizar simulados de resposta a incidentes",
+      "Atualizar plano de resposta regularmente",
+      "Integrar com equipe de segurança da informação"
+    ],
+    alto: [
+      "Automatizar partes do processo de resposta",
+      "Integrar com sistemas de detecção",
+      "Implementar análise pós-incidente automatizada"
+    ]
+  },
+  RC: {
+    baixo: [
+      "Criar backups regulares de dados críticos",
+      "Estabelecer procedimentos básicos de recuperação",
+      "Identificar sistemas prioritários para recuperação"
+    ],
+    medio: [
+      "Implementar plano de continuidade de negócios",
+      "Testar procedimentos de recuperação regularmente",
+      "Estabelecer SLAs para tempo de recuperação"
+    ],
+    alto: [
+      "Implementar recuperação automatizada",
+      "Ter infraestrutura redundante para sistemas críticos",
+      "Realizar análises pós-recuperação automatizadas"
+    ]
+  }
 };
 
-// Gerador de recomendações personalizadas
 export const getRecomendacoesPersonalizadas = (responses, questions) => {
-  // 1. Calcular scores por categoria
   const scores = {};
   const categorias = {};
 
-  // Agrupar perguntas por categoria
   questions.forEach(question => {
     const categoria = question.category.split('.')[0];
     if (!categorias[categoria]) {
@@ -64,7 +126,6 @@ export const getRecomendacoesPersonalizadas = (responses, questions) => {
     categorias[categoria].push(question);
   });
 
-  // Calcular médias para cada categoria
   Object.entries(categorias).forEach(([categoria, perguntas]) => {
     let sumPolitica = 0;
     let sumPratica = 0;
@@ -89,7 +150,6 @@ export const getRecomendacoesPersonalizadas = (responses, questions) => {
     };
   });
 
-  // 2. Identificar pontos fortes e fracos
   const pontosFracos = [];
   const pontosFortes = [];
   const prioridades = [];
@@ -122,11 +182,8 @@ export const getRecomendacoesPersonalizadas = (responses, questions) => {
     }
   });
 
-  // 3. Sugerir equipamentos baseado no nível geral
   const nivelGeral = calcularNivelGeral(scores);
   const equipamentos = sugerirEquipamentos(nivelGeral, pontosFracos);
-
-  // 4. Gerar resumo executivo
   const resumo = gerarResumoExecutivo(scores, pontosFracos, pontosFortes);
 
   return {
@@ -142,7 +199,6 @@ export const getRecomendacoesPersonalizadas = (responses, questions) => {
   };
 };
 
-// Funções auxiliares
 function calcularNivelGeral(scores) {
   const valores = Object.values(scores).map(s => s.total);
   const media = valores.reduce((a, b) => a + b, 0) / valores.length;
@@ -183,7 +239,6 @@ function sugerirEquipamentos(nivelGeral, pontosFracos) {
     ]
   };
 
-  // Adicionar equipamentos específicos para pontos fracos
   const extras = [];
   pontosFracos.forEach(ponto => {
     if (ponto.categoria === 'PR' && ponto.nivel === 'baixo') {
@@ -198,6 +253,10 @@ function sugerirEquipamentos(nivelGeral, pontosFracos) {
 }
 
 function gerarResumoExecutivo(scores, pontosFracos, pontosFortes) {
+  if (pontosFracos.length === 0 && pontosFortes.length === 0) {
+    return "Não foi possível gerar um resumo executivo com os dados disponíveis.";
+  }
+
   const piorCategoria = pontosFracos.reduce((prev, current) => 
     (prev.score.total < current.score.total) ? prev : current, pontosFracos[0]);
   
