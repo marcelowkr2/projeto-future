@@ -1,7 +1,5 @@
-# 2024_2_Future_Projeto_Avaliacao_Maturidade_Seguranca_PPSI
-
 # PROJETO DE AVALIZAÇÃO DE MATURIDADE DE CIBERSEGURANÇA.
->>>>>>> 0651623e61f1e39903818f6dd7399dbd85d02904
+
 
 🚀 Este projeto visa avaliar a maturidade de segurança do sistema PPSI, implementando melhores práticas e técnicas de segurança em diferentes camadas do sistema. O projeto será dividido em duas partes principais: o **frontend** e o **backend**. A arquitetura do projeto seguirá uma estrutura modular e escalável, visando facilitar o desenvolvimento e a manutenção contínua.
 
