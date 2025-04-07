@@ -1,6 +1,5 @@
-<<<<<<< HEAD
 # 2024_2_Future_Projeto_Avaliacao_Maturidade_Seguranca_PPSI
-=======
+
 # PROJETO DE AVALIZAÇÃO DE MATURIDADE DE CIBERSEGURANÇA.
 >>>>>>> 0651623e61f1e39903818f6dd7399dbd85d02904
 
