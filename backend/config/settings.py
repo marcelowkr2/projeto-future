@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'axes',
     'django_extensions',
     'users',
+    'form',
 ]
 
 SIMPLE_JWT = {
@@ -135,11 +136,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "futurecyber_db",
-        "USER": "postgres",
-        "PASSWORD": "dU2q4Lpm12@#$",
-        "HOST": "localhost",  # Deve corresponder ao nome do serviço no Docker ou ao hostname/IP real
-        "PORT": "5432",  # Porta padrão do PostgreSQL
+        "NAME": os.getenv("POSTGRES_DB", "futurecyber_db"),
+        "USER": os.getenv("POSTGRES_USER", "postgres"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "dU2q4Lpm12"),
+        "HOST": os.getenv(
+            "POSTGRES_HOST", "localhost"
+        ),  # usa 'db' no Docker e 'localhost' fora
+        "PORT": os.getenv("POSTGRES_PORT", "5432"),
     }
 }
 

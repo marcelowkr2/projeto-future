@@ -34,6 +34,9 @@ services:
     command: >
       sh -c "sleep 10 &&
              python manage.py migrate &&
+             python database/seed_users.py &&
+             python database/seed_questions.py &&
+             python database/seed_respostas.py &&
              python manage.py runserver 0.0.0.0:8000"
     environment:
       - ENV=development

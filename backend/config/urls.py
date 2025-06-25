@@ -13,6 +13,9 @@ from .views import (
 urlpatterns = [
     # Rota da home
     path('', home, name='home'),
+
+    path("api/form/", include("form.urls")),
+
     
     # Painel administrativo
     path('admin/', admin.site.urls),
