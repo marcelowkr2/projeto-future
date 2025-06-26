@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import API from '../services/api';
 import { getAuthToken } from '../utils/auth';
 import { Radar } from 'react-chartjs-2';
-import { 
-  Chart as ChartJS, 
-  RadialLinearScale, 
-  PointElement, 
-  LineElement, 
-  Filler, 
-  Tooltip, 
-  Legend 
+import {
+  Chart as ChartJS,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend
 } from 'chart.js';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import html2canvas from 'html2canvas';
@@ -40,26 +40,26 @@ const Assessment = () => {
       try {
         setLoading(true);
         const token = getAuthToken();
-        
+
         if (!token) {
           throw new Error('Autenticação necessária');
         }
 
         const response = await API.get('/assessments/questions/', {
           headers: { Authorization: `Bearer ${token}` }
-        });
+        })
 
         if (!response.data) {
           throw new Error('Dados inválidos da API');
         }
 
         setQuestions(response.data);
-        
+
         const uniqueCategories = [...new Set(
           response.data.map(q => q.category.split('.')[0])
         )];
         setCategories(uniqueCategories);
-        
+
         if (uniqueCategories.length > 0) {
           setActiveCategory(uniqueCategories[0]);
         }
@@ -73,6 +73,19 @@ const Assessment = () => {
 
     fetchQuestions();
   }, []);
+
+  useEffect(() => {
+    if (questions.length) {
+      const randomResponses = {};
+      questions.forEach(q => {
+        randomResponses[q.id] = {
+          politica: Math.floor(Math.random() * 5) + 1,
+          pratica: Math.floor(Math.random() * 5) + 1,
+        };
+      });
+      setResponses(randomResponses);
+    }
+  }, [questions]);
 
   useEffect(() => {
     if (questions.length > 0) {
@@ -97,7 +110,7 @@ const Assessment = () => {
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
-      
+
       const unanswered = questions.filter(q => {
         const response = responses[q.id];
         return !response?.politica || !response?.pratica;
@@ -106,13 +119,13 @@ const Assessment = () => {
       if (unanswered.length > 0) {
         setUnansweredQuestions(unanswered);
         window.scrollTo(0, 0);
-        
+
         let alertMessage = `Faltam responder ${unanswered.length} pergunta(s):\n\n`;
         unanswered.forEach((q, index) => {
           const missing = [];
           if (!responses[q.id]?.politica) missing.push('Política');
           if (!responses[q.id]?.pratica) missing.push('Prática');
-          
+
           alertMessage += `${index + 1}. ${q.text} [${getCategoryName(q.category.split('.')[0])}]\n(Faltando: ${missing.join(' e ')})\n\n`;
         });
 
@@ -124,16 +137,16 @@ const Assessment = () => {
       const csrfToken = document.cookie.split('; ')
         .find(row => row.startsWith('csrftoken='))
         ?.split('=')[1];
-  
+
       const formattedResponses = Object.entries(responses).map(([questionId, values]) => ({
         question: questionId,
         ...values
       }));
-  
+
       await API.post('/assessments/submit/', formattedResponses, {
-        headers: { 
+        headers: {
           Authorization: `Bearer ${token}`,
-          'X-CSRFToken': csrfToken 
+          'X-CSRFToken': csrfToken
         }
       });
 
@@ -177,7 +190,7 @@ const Assessment = () => {
           console.error('Erro ao capturar gráfico:', err);
         }
       }, 500);
-      
+
     } catch (err) {
       console.error('Erro ao gerar relatório:', err);
       alert('Erro ao gerar relatório. Verifique o console para mais detalhes.');
@@ -201,7 +214,7 @@ const Assessment = () => {
         label: 'Política',
         data: categories.map(cat => report?.scores[cat]?.politica || 0),
         backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        borderColor: 'rgba(54, 162, 235, 1)',
+        borderColor: 'rgb(209, 20, 20)',
         borderWidth: 2,
         pointBackgroundColor: 'rgba(54, 162, 235, 1)',
         pointBorderColor: '#fff',
@@ -244,7 +257,7 @@ const Assessment = () => {
             size: 12,
             weight: 'bold'
           },
-          callback: function(value) {
+          callback: function (value) {
             const levelDescriptions = {
               1: 'Inicial',
               2: 'Repetido',
@@ -307,7 +320,7 @@ const Assessment = () => {
       <div className={styles.errorContainer}>
         <h3>Erro ao carregar avaliação</h3>
         <p>{error}</p>
-        <button 
+        <button
           onClick={() => window.location.reload()}
           className={styles.retryButton}
         >
@@ -320,8 +333,8 @@ const Assessment = () => {
   return (
     <>
       <div className={styles.progressContainerFixed}>
-        <div 
-          className={styles.progressBarFixed} 
+        <div
+          className={styles.progressBarFixed}
           style={{ width: `${progress}%` }}
         ></div>
         <span className={styles.progressTextFixed}>
@@ -343,7 +356,7 @@ const Assessment = () => {
                     {!responses[q.id]?.politica && <span>Política</span>}
                     {!responses[q.id]?.pratica && <span>Prática</span>}
                   </div>
-                  <button 
+                  <button
                     onClick={() => {
                       document.getElementById(`question-${q.id}`)?.scrollIntoView({
                         behavior: 'smooth'
@@ -356,7 +369,7 @@ const Assessment = () => {
                 </li>
               ))}
             </ul>
-            <button 
+            <button
               onClick={() => setUnansweredQuestions([])}
               className={styles.closeButton}
             >
@@ -368,27 +381,26 @@ const Assessment = () => {
         {!showReport ? (
           <>
             <h1 className={styles.title}>Avaliação de Maturidade LGPD</h1>
-            
+
             <div className={styles.categoryMenu}>
               {categories.map(category => (
                 <button
                   key={category}
-                  className={`${styles.categoryButton} ${
-                    activeCategory === category ? styles.active : ''
-                  }`}
+                  className={`${styles.categoryButton} ${activeCategory === category ? styles.active : ''
+                    }`}
                   onClick={() => setActiveCategory(category)}
                 >
                   {getCategoryName(category)}
                 </button>
               ))}
             </div>
-            
+
             <div className={styles.questionsContainer}>
               {questions
                 .filter(q => q.category.startsWith(activeCategory))
                 .map(question => (
-                  <div 
-                    key={question.id} 
+                  <div
+                    key={question.id}
                     id={`question-${question.id}`}
                     className={styles.questionCard}
                   >
@@ -396,14 +408,14 @@ const Assessment = () => {
                     <p className={styles.questionCategory}>
                       Categoria: {getCategoryName(question.category.split('.')[0])} ({question.category})
                     </p>
-                    
+
                     <div className={styles.responseSection}>
                       <h4>Política</h4>
                       <select
                         value={responses[question.id]?.politica || ''}
                         onChange={(e) => handleResponseChange(
-                          question.id, 
-                          'politica', 
+                          question.id,
+                          'politica',
                           e.target.value
                         )}
                         className={styles.responseSelect}
@@ -416,14 +428,14 @@ const Assessment = () => {
                         ))}
                       </select>
                     </div>
-                    
+
                     <div className={styles.responseSection}>
                       <h4>Prática</h4>
                       <select
                         value={responses[question.id]?.pratica || ''}
                         onChange={(e) => handleResponseChange(
-                          question.id, 
-                          'pratica', 
+                          question.id,
+                          'pratica',
                           e.target.value
                         )}
                         className={styles.responseSelect}
@@ -439,17 +451,17 @@ const Assessment = () => {
                   </div>
                 ))}
             </div>
-            
+
             <div className={styles.buttonsContainer}>
-              <button 
+              <button
                 onClick={handleSubmit}
                 className={styles.submitButton}
                 disabled={isSubmitting}
               >
                 {isSubmitting ? 'Salvando...' : 'Salvar Respostas'}
               </button>
-              
-              <button 
+
+              <button
                 onClick={generateReport}
                 className={styles.reportButton}
                 disabled={progress < 100}
@@ -460,39 +472,51 @@ const Assessment = () => {
           </>
         ) : (
           <div className={styles.reportContainer}>
-            <button 
+            <button
               onClick={() => setShowReport(false)}
               className={styles.backButton}
             >
               Voltar para avaliação
             </button>
-            
+
+            {/* Adicione esta div com a imagem acima do gráfico radar */}
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <img
+                src="/assets/logo_future.png"
+                alt="Logo Future"
+                style={{ maxWidth: '300px', height: 'auto' }}
+              />
+            </div>
+            <div>
+              
+            </div>
+
             <div ref={radarChartRef} style={{ height: '500px', marginBottom: '40px' }}>
               <Radar data={radarData} options={radarOptions} />
             </div>
-            
+
             <RelatorioRecomendacoes report={report} />
 
             {radarImage && (
-  <PDFDownloadLink
-    document={
-      <PDFGenerator
-        report={report}
-        radarImage={radarImage}
-        questions={questions}
-        responses={responses}
-      />
-    }
-    fileName={`relatorio_lgpd_${new Date().toISOString().slice(0,10)}.pdf`}
-    className={styles.pdfLink}
-  >
-    {({ loading }) => (
-      <button className={styles.pdfButton}>
-        {loading ? 'Preparando PDF...' : 'Baixar Relatório PDF'}
-      </button>
-    )}
-  </PDFDownloadLink>
-)}
+              <PDFDownloadLink
+                document={
+                  <PDFGenerator
+                    report={report}
+                    radarImage={radarImage}
+                    questions={questions}
+                    responses={responses}
+                  />
+                }
+                fileName={`relatorio_lgpd_${new Date().toISOString().slice(0, 10)}.pdf`}
+                className={styles.pdfLink}
+              >
+                {({ loading }) => (
+                  <button className={styles.pdfButton}>
+                    {loading ? 'Preparando PDF...' : 'Baixar Relatório PDF'}
+                  </button>
+                )}
+              </PDFDownloadLink>
+            )}
           </div>
         )}
       </div>
